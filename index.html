@@ -7,39 +7,94 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html {
+  height: 100%;
+}
+
 body {
-  background: #fff;
-  display: flex; align-items: flex-start; justify-content: center;
-  padding: 24px 16px;
+  background: #f0f2f5;
   font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
-  min-height: 100vh;
   color: #1e2a3a;
+  height: 100%; overflow: hidden;
+  display: flex; flex-direction: column;
 }
 
 #app {
-  width: 425px;
-  background: #fff;
-  border: 1px solid #d0d7e2;
-  border-radius: 10px;
-  box-shadow: 0 4px 24px rgba(30,42,58,0.10);
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
-/* ── APP HEADER ── */
+/* ── TOP HEADER (full width) ── */
 #app-header {
   background: #1e2a3a;
-  padding: 11px 14px 9px;
+  padding: 9px 16px 8px;
+  display: flex; align-items: center; gap: 16px;
+  flex-shrink: 0;
+  border-bottom: 1px solid #12202e;
 }
+
+/* ── MAIN BODY: left panel + right canvas ── */
+#app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+  height: 0; /* force flex child to respect flex:1 */
+}
+
+/* ── LEFT CONTROL PANEL ── */
+#left-panel {
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: #fff;
+  border-right: 1px solid #d0d7e2;
+  height: 100%;
+}
+
+/* ── RIGHT GRAPH AREA ── */
+#right-canvas {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  background: #f0f2f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* ── GRAPH STACK (picker + legend + canvas, all same width) ── */
+#graph-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+#graph-wrap {
+  position: relative;
+  background: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(30,42,58,0.10);
+}
+
 #app-title {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 16px; font-weight: bold;
+  font-size: 15px; font-weight: bold;
   color: #fff; letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 #app-subtitle {
-  font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
-  font-size: 10px; color: rgba(255,255,255,0.62);
-  margin-top: 2px; font-style: italic;
+  font-size: 10px; color: rgba(255,255,255,0.58);
+  font-style: italic; white-space: nowrap;
 }
 
 /* ── TOOLBAR ── */
@@ -50,6 +105,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  flex-shrink: 0;
 }
 .tb-row {
   display: flex;
@@ -81,14 +137,7 @@ select.tb {
   border-radius: 5px; cursor: pointer; max-width: 90px; color: #1e2a3a;
 }
 
-/* ── GRAPH CANVAS AREA ── */
-#graph-wrap {
-  position: relative; width: 100%; height: 355px;
-  background: #fff;
-  border-top: 1px solid #d0d7e2;
-  border-bottom: 1px solid #d0d7e2;
-}
-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 355px; }
+canvas { position: absolute; top: 0; left: 0; }
 #dc { cursor: crosshair; }
 #oc { pointer-events: none; }
 
@@ -125,6 +174,16 @@ canvas { position: absolute; top: 0; left: 0; width: 100%; height: 355px; }
   white-space: nowrap; flex-shrink: 0;
 }
 
+/* Quick Symbol Chips */
+.sym-chip {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 10px; font-weight: 500;
+  padding: 2px 6px; border: 1px solid #c8d0dc; background: #fff;
+  cursor: pointer; border-radius: 4px; color: #1e2a3a;
+  transition: background 0.1s, border-color 0.1s;
+}
+.sym-chip:hover { background: #edf0f5; border-color: #a8b4c4; }
+
 /* ── CATEGORY EDITOR ── */
 #cat-section { display: none; }
 #cat-list {
@@ -159,7 +218,7 @@ canvas { position: absolute; top: 0; left: 0; width: 100%; height: 355px; }
   margin-bottom: 5px;
 }
 .leg-hdr span { font-size: 11px; color: #4a5568; font-weight: 600; }
-#leg-list { display: flex; flex-direction: column; gap: 4px; max-height: 72px; overflow-y: auto; }
+#leg-list { display: flex; flex-direction: column; gap: 4px; max-height: 168px; overflow-y: auto; }
 .leg-row { display: flex; align-items: center; gap: 5px; }
 .leg-row input[type=color] { width: 24px; height: 20px; border: 1px solid #c8d0dc; padding: 0; cursor: pointer; border-radius: 4px; }
 .leg-row input[type=text]  { flex:1; font-size:11px; padding:3px 5px; border:1px solid #c8d0dc; border-radius:5px; background:#fff; }
@@ -169,16 +228,22 @@ canvas { position: absolute; top: 0; left: 0; width: 100%; height: 355px; }
 /* ── BAR SERIES PICKER ── */
 #bar-ser-picker {
   display: none;
-  border-top: 1px solid #e4e8ef;
   background: #f4f6f9;
-  padding: 6px 10px;
-  gap: 6px;
+  padding: 5px 8px;
+  gap: 5px;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
+  border: 1px solid #e4e8ef;
+  border-bottom: none;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
 }
 #bar-ser-picker .bsp-label {
   font-size: 10px; color: #6b7a90;
-  white-space: nowrap; margin-right: 2px;
+  margin-right: 2px;
 }
 .bsp-btn {
   display: flex; align-items: center; gap: 5px;
@@ -186,7 +251,7 @@ canvas { position: absolute; top: 0; left: 0; width: 100%; height: 355px; }
   border: 2px solid transparent;
   font-size: 11px; font-weight: 600;
   background: #fff; transition: border-color 0.1s, box-shadow 0.1s;
-  white-space: nowrap; color: #1e2a3a;
+  color: #1e2a3a;
 }
 .bsp-btn .bsp-swatch {
   width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0;
@@ -242,6 +307,35 @@ canvas { position: absolute; top: 0; left: 0; width: 100%; height: 355px; }
 /* histogram cursor */
 #dc.hist-hover { cursor: ns-resize; }
 
+/* ── HTML LEGEND STRIP ── */
+#html-legend {
+  display: none;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 8px;
+  background: #f9fafc;
+  border: 1px solid #e4e8ef;
+  border-bottom: none;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+.hl-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: #1e2a3a;
+}
+.hl-swatch {
+  width: 16px; height: 12px; border-radius: 3px; flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.12);
+}
+.hl-marker {
+  width: 16px; height: 16px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
 /* old standalone statusbar rule kept for JS target */
 #statusbar { border: none; background: transparent; }
 </style>
@@ -249,149 +343,184 @@ canvas { position: absolute; top: 0; left: 0; width: 100%; height: 355px; }
 <body>
 <div id="app">
 
-<!-- ══ HEADER ══ -->
+<!-- ══ HEADER (full width top bar) ══ -->
 <div id="app-header">
-  <div id="app-title">A Humble Quick Plot</div>
-  <div id="app-subtitle">A Quick Graph Builder for Students — Created by Steven Humble</div>
+  <div>
+    <div id="app-title">A Humble Quick Plot</div>
+    <div id="app-subtitle">A Quick Graph Builder for Students — Created by Steven Humble</div>
+  </div>
 </div>
 
-<!-- ══ TOOLBAR ══ -->
-<div id="toolbar">
+<!-- ══ APP BODY: left controls + right canvas ══ -->
+<div id="app-body">
 
-  <!-- Row 1: Type (left) + Undo + Clear (right) -->
-  <div class="tb-row" style="justify-content: space-between;">
-    <div class="tg">
-      <span class="tg-label">Type:</span>
-      <button class="tb active" id="btn-bar"       onclick="setType('bar')">Bar</button>
-      <button class="tb"        id="btn-line"      onclick="setType('line')">Line</button>
-      <button class="tb"        id="btn-scatter"   onclick="setType('scatter')">Scatter</button>
-      <button class="tb"        id="btn-histogram" onclick="setType('histogram')">Histogram</button>
+  <!-- LEFT PANEL: toolbar + all controls -->
+  <div id="left-panel">
+
+  <!-- ══ TOOLBAR ══ -->
+  <div id="toolbar">
+
+    <!-- Row 1: Graph type buttons -->
+    <div class="tb-row">
+      <div class="tg">
+        <span class="tg-label">Type:</span>
+        <button class="tb active" id="btn-bar"       onclick="setType('bar')">Bar</button>
+        <button class="tb"        id="btn-line"      onclick="setType('line')">Line</button>
+        <button class="tb"        id="btn-scatter"   onclick="setType('scatter')">Scatter</button>
+        <button class="tb"        id="btn-histogram" onclick="setType('histogram')">Histogram</button>
+      </div>
     </div>
-    <div class="tg">
-      <button class="tb" onclick="undoLast()">↩ Undo</button>
-      <button class="tb red" onclick="clearAll()">✕ Clear</button>
+
+    <!-- Row 2: Tools (Best Fit & Error) -->
+    <div class="tb-row" style="justify-content: center;">
+      <div class="tg">
+        <button class="tb" id="btn-bf" onclick="toggleBestFit()" title="Toggle best-fit line (scatter)">Best Fit</button>
+        <button class="tb" id="btn-eb" onclick="toggleErrorBars()" title="Toggle error bar entry mode">± Error</button>
+      </div>
     </div>
-  </div>
 
-  <!-- Row 2: centered -->
-  <div class="tb-row" style="justify-content: center;">
-    <div class="tg">
-      <span class="tg-label" id="ser-label">Series:</span>
-      <select class="tb" id="ser-sel" onchange="setActiveSeries(+this.value)"></select>
+    <!-- Row 3: + Series + Undo + Delete + Clear -->
+    <div class="tb-row" style="justify-content: center;">
+      <div class="tg" id="tg-addseries">
+        <button class="tb" onclick="addSeries()">+ Series</button>
+      </div>
+      <div class="tg" style="border-left:none; padding-left:3px; margin-left:0;">
+        <button class="tb" onclick="undoLast()">↩ Undo</button>
+        <button class="tb" id="btn-delete" onclick="toggleDeleteMode()" title="Toggle delete mode">🗑</button>
+        <button class="tb red" onclick="clearAll()">✕ Clear All</button>
+      </div>
     </div>
-    <div class="tg">
-      <button class="tb" id="btn-bf" onclick="toggleBestFit()" title="Toggle best-fit line (scatter)">Best Fit</button>
-      <button class="tb" id="btn-eb" onclick="toggleErrorBars()" title="Toggle error bar entry mode">± Error</button>
+
+  </div><!-- #toolbar -->
+
+    <!-- ══ AXIS LABELS + SCALE ══ -->
+    <div class="section">
+      <div class="row">
+        <label>X-Axis Label:</label>
+        <input type="text" id="inp-xlabel" placeholder="" oninput="onXLabelChange()" onfocus="activeLabelInput=this">
+      </div>
+      <div class="row" id="xscale-row" style="display:none; flex-wrap:nowrap; justify-content:center;">
+        <span class="mini-label" id="xscale-lbl">Min:</span>
+        <input type="number" id="inp-xmin" value="-10" oninput="redraw()" style="width:50px">
+        <span class="mini-label" id="xmax-lbl">Max:</span>
+        <input type="number" id="inp-xmax" value="10" oninput="redraw()" style="width:50px">
+        <span class="mini-label" id="xstep-lbl">Step:</span>
+        <input type="number" id="inp-xstep" value="1" oninput="redraw()" style="width:50px">
+      </div>
+      <hr style="border:none; border-top:1px dotted #c8d0dc; margin:5px 0;">
+      <div class="row">
+        <label>Y-Axis Label:</label>
+        <input type="text" id="inp-ylabel" placeholder="" oninput="redraw()" onfocus="activeLabelInput=this">
+      </div>
+      <div class="row" style="flex-wrap:nowrap; justify-content:center;">
+        <span class="mini-label">Min:</span>
+        <input type="number" id="inp-ymin" value="-10" oninput="redraw()" style="width:50px">
+        <span class="mini-label">Max:</span>
+        <input type="number" id="inp-ymax" value="10" oninput="redraw()" style="width:50px">
+        <span class="mini-label">Step:</span>
+        <input type="number" id="inp-ystep" value="1" oninput="redraw()" style="width:50px">
+      </div>
+      <hr style="border:none; border-top:1px dotted #c8d0dc; margin:5px 0;">
+      <!-- Quick Symbols Toolbar Row -->
+      <div class="row" style="align-items: center; justify-content: center; gap: 3px;">
+        <span class="mini-label" style="margin-right: 2px;">Symbols:</span>
+        <button type="button" class="sym-chip" onclick="insertSymbol('°C')">°C</button>
+        <button type="button" class="sym-chip" onclick="insertSymbol('μL')">μL</button>
+        <button type="button" class="sym-chip" onclick="insertSymbol('O₂')">O₂</button>
+        <button type="button" class="sym-chip" onclick="insertSymbol('CO₂')">CO₂</button>
+        <button type="button" class="sym-chip" onclick="insertSymbol('±')">±</button>
+        <button type="button" class="sym-chip" onclick="insertSymbol('Δ')">Δ</button>
+        <button type="button" class="sym-chip" onclick="insertSymbol('μm')">μm</button>
+      </div>
     </div>
-    <div class="tg" id="tg-addseries">
-      <button class="tb" onclick="addSeries()">+ Series</button>
+
+    <!-- ══ LEGEND EDITOR ══ -->
+    <div class="section" id="leg-section">
+      <div id="leg-normal">
+        <div class="leg-hdr">
+          <span>Legend / Series</span>
+          <button class="tb" onclick="addSeries()">+ Add Series</button>
+        </div>
+        <div id="leg-list"></div>
+      </div>
+      <div id="leg-hist" style="display:none">
+        <div class="row">
+          <label>Bar Color:</label>
+          <input type="color" value="#1a56b8" id="hist-color"
+            onchange="series[0].color=this.value; redraw()">
+        </div>
+      </div>
     </div>
-  </div>
 
-</div>
-
-<!-- ══ AXIS LABELS + SCALE ══ -->
-<div class="section">
-  <div class="row">
-    <label>X-Axis Label:</label>
-    <input type="text" id="inp-xlabel" placeholder="" oninput="onXLabelChange()">
-    <span class="mini-label" id="xscale-lbl" style="display:none">Min:</span>
-    <input type="number" id="inp-xmin" value="0" oninput="redraw()" style="display:none">
-    <span class="mini-label" id="xmax-lbl" style="display:none">Max:</span>
-    <input type="number" id="inp-xmax" value="10" oninput="redraw()" style="display:none">
-    <span class="mini-label" id="xstep-lbl" style="display:none">Step:</span>
-    <input type="number" id="inp-xstep" value="" oninput="redraw()" style="display:none;width:42px">
-  </div>
-  <div class="row">
-    <label>Y-Axis Label:</label>
-    <input type="text" id="inp-ylabel" placeholder="" oninput="redraw()">
-    <span class="mini-label">Min:</span>
-    <input type="number" id="inp-ymin" value="-5" oninput="redraw()">
-    <span class="mini-label">Max:</span>
-    <input type="number" id="inp-ymax" value="5" oninput="redraw()">
-    <span class="mini-label">Step:</span>
-    <input type="number" id="inp-ystep" value="1" oninput="redraw()" style="width:42px">
-  </div>
-</div>
-
-<!-- ══ LEGEND EDITOR ══ -->
-<div class="section" id="leg-section">
-  <!-- normal multi-series editor (bar / line / scatter) -->
-  <div id="leg-normal">
-    <div class="leg-hdr">
-      <span>Legend / Series</span>
-      <button class="tb" onclick="addSeries()">+ Add Series</button>
+    <!-- ══ CATEGORY EDITOR (bar only) ══ -->
+    <div class="section" id="cat-section">
+      <div class="row">
+        <label>Bar Style:</label>
+        <span class="mini-label">Groups:</span>
+        <input type="number" id="inp-groups" value="1" min="1" max="6" step="1"
+          style="width:42px" oninput="onGroupsChange()">
+      </div>
+      <div class="row" style="margin-bottom:0">
+        <label>X Categories:</label>
+        <span style="font-size:10px;color:#999;">Add a label for each bar</span>
+      </div>
+      <div id="cat-list"></div>
+      <div id="cat-input-wrap">
+        <input type="text" id="cat-input" placeholder="Type a category name…" onkeydown="if(event.key==='Enter')addCategory()">
+        <button onclick="addCategory()">+ Add</button>
+      </div>
+      <div id="cat-hint">↑ Type a category name and click + Add to build your graph</div>
     </div>
-    <div id="leg-list"></div>
-  </div>
-  <!-- histogram: just a color picker, no label needed -->
-  <div id="leg-hist" style="display:none">
-    <div class="row">
-      <label>Bar Color:</label>
-      <input type="color" value="#1a56b8" id="hist-color"
-        onchange="series[0].color=this.value; redraw()">
+
+    <!-- ══ HISTOGRAM CONFIG ══ -->
+    <div class="section" id="hist-section" style="display:none">
+      <div class="row" style="flex-wrap:nowrap; justify-content:center;">
+        <span class="mini-label">Bin Start:</span>
+        <input type="number" id="inp-binstart" value="0" oninput="redraw()" style="width:50px">
+        <span class="mini-label">Width:</span>
+        <input type="number" id="inp-binwidth" value="1" min="0.01" oninput="redraw()" style="width:50px">
+        <span class="mini-label"># Bins:</span>
+        <input type="number" id="inp-bincount" value="5" min="1" max="20" oninput="redraw()" style="width:50px">
+      </div>
+      <div id="hist-hint" style="font-size:10px;color:#1d5fc4;margin-top:3px;display:none">
+        Set bin parameters above, then click each bin to enter its frequency
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- ══ CATEGORY EDITOR (bar only) ══ -->
-<div class="section" id="cat-section">
-  <div class="row">
-    <label>Bar Style:</label>
-    <span class="mini-label">Groups:</span>
-    <input type="number" id="inp-groups" value="1" min="1" max="6" step="1"
-      style="width:42px" oninput="onGroupsChange()" title="Number of bar series (1 = simple bars, 2+ = grouped)">
-  </div>
-  <div class="row" style="margin-bottom:0">
-    <label>X Categories:</label>
-    <span style="font-family:Arial,sans-serif;font-size:10px;color:#666;">Add a label for each bar</span>
-  </div>
-  <div id="cat-list"></div>
-  <div id="cat-input-wrap">
-    <input type="text" id="cat-input" placeholder="Type a category name…" onkeydown="if(event.key==='Enter')addCategory()">
-    <button onclick="addCategory()">+ Add</button>
-  </div>
-  <div id="cat-hint">↑ Type a category name and click + Add to build your graph</div>
-</div>
+    <!-- ══ EXPORT ══ -->
+    <div id="export-row">
+      <span>Export:</span>
+      <button class="tb" onclick="downloadPNG()">⬇ Download PNG</button>
+      <button class="tb green" onclick="copyPNG()" id="btn-copy">📋 Copy Image</button>
+    </div>
 
-<!-- ══ HISTOGRAM CONFIG (histogram only) ══ -->
-<div class="section" id="hist-section" style="display:none">
-  <div class="row">
-    <label>Bin Start:</label>
-    <input type="number" id="inp-binstart" value="0" oninput="redraw()" style="width:52px">
-    <span class="mini-label" style="margin-left:4px">Bin Width:</span>
-    <input type="number" id="inp-binwidth" value="1" min="0.01" oninput="redraw()" style="width:52px">
-    <span class="mini-label" style="margin-left:4px"># of Bins:</span>
-    <input type="number" id="inp-bincount" value="5" min="1" max="20" oninput="redraw()" style="width:42px">
-  </div>
-  <div id="hist-hint" style="font-family:Arial,sans-serif;font-size:10px;color:#1d5fc4;margin-top:3px;display:none">
-    ← Set your bin parameters above, then click each bin to enter its frequency
-  </div>
-</div>
-<div id="bar-ser-picker">
-  <span class="bsp-label">Drawing on:</span>
-  <!-- buttons injected by JS -->
-</div>
+    <!-- ══ STATUS + VERSION ══ -->
+    <div id="statusbar-row">
+      <div id="statusbar"></div>
+      <div id="app-version">v1.2.5 &nbsp;·&nbsp; 08-14-2026</div>
+    </div>
 
-<!-- ══ GRAPH ══ -->
-<div id="graph-wrap">
-  <canvas id="gc" width="425" height="355"></canvas>  <!-- grid -->
-  <canvas id="dc" width="425" height="355"></canvas>  <!-- data -->
-  <canvas id="oc" width="425" height="355"></canvas>  <!-- overlay/legend -->
-</div>
+  </div><!-- #left-panel -->
 
-<!-- ══ EXPORT ══ -->
-<div id="export-row">
-  <span>Export graph:</span>
-  <button class="tb green" onclick="downloadPNG()">⬇ Download PNG</button>
-  <button class="tb" onclick="copyPNG()" id="btn-copy">📋 Copy Image</button>
-</div>
+  <!-- RIGHT: series picker + legend + graph canvas -->
+  <div id="right-canvas">
+    <div id="graph-stack">
+      <!-- series picker (shows above graph when >1 series) -->
+      <div id="bar-ser-picker">
+        <span class="bsp-label">Drawing on:</span>
+      </div>
+      <!-- html legend strip -->
+      <div id="html-legend"></div>
+      <!-- the graph itself -->
+      <div id="graph-wrap">
+        <canvas id="gc"></canvas>
+        <canvas id="dc"></canvas>
+        <canvas id="oc"></canvas>
+      </div>
+    </div>
+  </div><!-- #right-canvas -->
 
-<!-- ══ STATUS ══ -->
-<div id="statusbar-row">
-  <div id="statusbar">Select a graph type, label your axes, then click the plot area to add data.</div>
-  <div id="app-version">v1.0.0 &nbsp;·&nbsp; 07-30-2026</div>
-</div>
+</div><!-- #app-body -->
 
 </div><!-- #app -->
 
@@ -399,16 +528,51 @@ canvas { position: absolute; top: 0; left: 0; width: 100%; height: 355px; }
 // ════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ════════════════════════════════════════════════
-const W = 425, H = 355;
+let W = 800, H = 600;
 const M = { top: 36, right: 30, bottom: 62, left: 62 };
+let activeLabelInput = null;
+
+function resizeCanvases(){
+  const header  = document.getElementById('app-header');
+  const leftPan = document.getElementById('left-panel');
+  const stack   = document.getElementById('graph-stack');
+
+  const leftW = leftPan.offsetWidth || 300;
+  const headH = header.offsetHeight || 50;
+  const pad   = 24;
+
+  const isHist = graphType === 'histogram';
+  const stripH = isHist ? 0 : 84;
+
+  const availW = window.innerWidth  - leftW - pad;
+  const availH = window.innerHeight - headH - stripH - pad;
+  const size   = Math.max(100, Math.min(availW, availH));
+
+  stack.style.width = size + 'px';
+
+  const wrap = document.getElementById('graph-wrap');
+  wrap.style.width  = size + 'px';
+  wrap.style.height = size + 'px';
+
+  W = size; H = size;
+
+  [gc, dc, oc].forEach(c => {
+    c.width  = size; c.height = size;
+    c.style.position = 'absolute';
+    c.style.top  = '0'; c.style.left = '0';
+    c.style.width  = size + 'px';
+    c.style.height = size + 'px';
+  });
+}
 const COLORS = ['#1a56b8','#c0392b','#27ae60','#8e44ad','#e67e22','#16a085'];
 const SHAPES  = ['circle','square','triangle','diamond','cross','star'];
 
 let graphType   = 'bar';
 let activeSer   = 0;
 let showBestFit = false;
-let errorMode   = false;   // when true, next click sets error bar on nearest point
-let categories  = [];      // bar-mode x labels
+let errorMode   = false;
+let deleteMode  = false;
+let categories  = [];
 
 let series = [
   { label:'Series 1', color: COLORS[0], points:[], errors:[] }
@@ -438,10 +602,24 @@ function inPlot(px,py){
   return px>=M.left && px<=M.left+pW() && py>=M.top && py<=M.top+pH();
 }
 
-function status(msg){ document.getElementById('statusbar').textContent = msg; }
+function status(msg){ /* intentionally blank for now */ }
+
+// Quick Symbol Insertion helper
+function insertSymbol(sym){
+  if(!activeLabelInput){
+    activeLabelInput = document.getElementById('inp-xlabel');
+  }
+  const start = activeLabelInput.selectionStart;
+  const end = activeLabelInput.selectionEnd;
+  const val = activeLabelInput.value;
+  activeLabelInput.value = val.substring(0, start) + sym + val.substring(end);
+  activeLabelInput.selectionStart = activeLabelInput.selectionEnd = start + sym.length;
+  activeLabelInput.focus();
+  redraw();
+}
 
 // ════════════════════════════════════════════════
-//  NICE TICK STEPS  (respects manual step input)
+//  NICE TICK STEPS
 // ════════════════════════════════════════════════
 function xStep(){
   const v = parseFloat(document.getElementById('inp-xstep').value);
@@ -491,9 +669,55 @@ function drawGrid(){
   gctx.clearRect(0,0,W,H);
   gctx.fillStyle='#fff'; gctx.fillRect(0,0,W,H);
 
+  const fs  = Math.max(9, Math.round(W / 80));
+  const fsl = Math.max(10, Math.round(W / 65));
+  const fsp = Math.max(11, Math.round(W / 60));
+
   // plot box
   gctx.strokeStyle='#111'; gctx.lineWidth=0.6;
   gctx.strokeRect(M.left,M.top,pW(),pH());
+
+  // ── FINE SUBDIVISION MINOR GRIDLINES ──
+  const yMajor = niceSteps(yMin(), yMax(), yStep());
+  if(yMajor.length >= 2){
+    const majorStep = yMajor[1] - yMajor[0];
+    const minorStep = majorStep / 5;
+    const startMinor = yMajor[0] - majorStep;
+    const endMinor = yMajor[yMajor.length - 1] + majorStep;
+    for(let v = startMinor; v <= endMinor + 1e-9; v += minorStep){
+      if(yMajor.some(m => Math.abs(m - v) < 1e-5)) continue;
+      const y = dy(v);
+      if(y < M.top || y > M.top + pH()) continue;
+      gctx.strokeStyle = '#f2f2f2';
+      gctx.lineWidth = 0.4;
+      gctx.beginPath();
+      gctx.moveTo(M.left, y);
+      gctx.lineTo(M.left + pW(), y);
+      gctx.stroke();
+    }
+  }
+
+  if(graphType !== 'bar' && graphType !== 'histogram'){
+    const xMajor = niceSteps(xMin(), xMax(), xStep());
+    if(xMajor.length >= 2){
+      const majorStep = xMajor[1] - xMajor[0];
+      const minorStep = majorStep / 5;
+      const startMinor = xMajor[0] - majorStep;
+      const endMinor = xMajor[xMajor.length - 1] + majorStep;
+      for(let v = startMinor; v <= endMinor + 1e-9; v += minorStep){
+        if(xMajor.some(m => Math.abs(m - v) < 1e-5)) continue;
+        const x = dx(v);
+        if(x < M.left || x > M.left + pW()) continue;
+        gctx.strokeStyle = '#f2f2f2';
+        gctx.lineWidth = 0.4;
+        gctx.beginPath();
+        gctx.moveTo(x, M.top);
+        gctx.lineTo(x, M.top + pH());
+        gctx.stroke();
+      }
+    }
+  }
+  // ──────────────────────────────────────
 
   const drawXTick = (v,label) => {
     const x = dx(v);
@@ -502,8 +726,8 @@ function drawGrid(){
     gctx.beginPath(); gctx.moveTo(x,M.top); gctx.lineTo(x,M.top+pH()); gctx.stroke();
     gctx.strokeStyle='#444'; gctx.lineWidth=1;
     gctx.beginPath(); gctx.moveTo(x,M.top+pH()); gctx.lineTo(x,M.top+pH()+5); gctx.stroke();
-    gctx.fillStyle='#222'; gctx.font='10px Arial'; gctx.textAlign='center';
-    gctx.fillText(label, x, M.top+pH()+16);
+    gctx.fillStyle='#222'; gctx.font=`${fs}px Arial`; gctx.textAlign='center';
+    gctx.fillText(label, x, M.top+pH()+fs+4);
   };
   const drawYTick = (v,label) => {
     const y = dy(v);
@@ -512,34 +736,31 @@ function drawGrid(){
     gctx.beginPath(); gctx.moveTo(M.left,y); gctx.lineTo(M.left+pW(),y); gctx.stroke();
     gctx.strokeStyle='#444'; gctx.lineWidth=1;
     gctx.beginPath(); gctx.moveTo(M.left,y); gctx.lineTo(M.left-5,y); gctx.stroke();
-    gctx.fillStyle='#222'; gctx.font='10px Arial'; gctx.textAlign='right';
-    gctx.fillText(label, M.left-7, y+3.5);
+    gctx.fillStyle='#222'; gctx.font=`${fs}px Arial`; gctx.textAlign='right';
+    gctx.fillText(label, M.left-7, y+fs/3);
   };
 
   if(graphType==='bar'){
-    // only draw x-ticks once categories exist
     if(categories.length){
       categories.forEach((cat,i)=>{
         const cx = catCenterX(i);
         drawXTick(xMin()+(cx-M.left)/pW()*(xMax()-xMin()), cat);
       });
     } else {
-      // draw a gentle prompt on the canvas itself
       const cx = M.left + pW()/2;
       const cy = M.top  + pH()/2;
       gctx.save();
       gctx.globalAlpha = 0.55;
       gctx.fillStyle   = '#1d5fc4';
-      gctx.font        = 'bold 13px Arial';
+      gctx.font        = `bold ${fsp}px Arial`;
       gctx.textAlign   = 'center';
-      gctx.fillText('Add an X Category above to start', cx, cy - 10);
-      gctx.font        = '11px Arial';
-      gctx.fillText('Type a name → click  + Add', cx, cy + 12);
+      gctx.fillText('Add an X Category to Start', cx, cy - Math.round(fsp*0.8));
+      gctx.font        = `${Math.round(fsp*0.85)}px Arial`;
+      gctx.fillText('Type a name → click  + Add', cx, cy + Math.round(fsp*0.9));
       gctx.restore();
       updateCatHint(true);
     }
   } else if(graphType==='histogram'){
-    // tick at each bin edge
     const start = parseFloat(document.getElementById('inp-binstart').value) || 0;
     const bw    = Math.max(0.01, parseFloat(document.getElementById('inp-binwidth').value) || 1);
     const n     = Math.max(1, Math.min(20, parseInt(document.getElementById('inp-bincount').value) || 5));
@@ -551,16 +772,15 @@ function drawGrid(){
   }
   niceSteps(yMin(), yMax(), yStep()).forEach(v => drawYTick(v, fmt(v)));
 
-  // ── thick x-axis baseline ──
-  // sits at y=0 if visible, otherwise hugs the bottom (all-positive) or top (all-negative) edge
+  // x-axis baseline
   {
     let baselineY;
     if(yMin() <= 0 && yMax() >= 0){
-      baselineY = dy(0);                      // zero is in view — draw there
+      baselineY = dy(0);
     } else if(yMin() > 0){
-      baselineY = M.top + pH();               // window entirely above 0 → bottom edge
+      baselineY = M.top + pH();
     } else {
-      baselineY = M.top;                      // window entirely below 0 → top edge
+      baselineY = M.top;
     }
     gctx.strokeStyle = '#111';
     gctx.lineWidth   = 2.5;
@@ -570,16 +790,15 @@ function drawGrid(){
     gctx.stroke();
   }
 
-  // ── thick y-axis baseline (line & scatter only) ──
-  // sits at x=0 if visible, otherwise hugs the left (all-positive) or right (all-negative) edge
+  // y-axis baseline
   if(graphType !== 'bar'){
     let baselineX;
     if(xMin() <= 0 && xMax() >= 0){
-      baselineX = dx(0);                      // zero is in view — draw there
+      baselineX = dx(0);
     } else if(xMin() > 0){
-      baselineX = M.left;                     // window entirely right of 0 → left edge
+      baselineX = M.left;
     } else {
-      baselineX = M.left + pW();              // window entirely left of 0 → right edge
+      baselineX = M.left + pW();
     }
     gctx.strokeStyle = '#111';
     gctx.lineWidth   = 2.5;
@@ -594,10 +813,10 @@ function drawGrid(){
   const yl = document.getElementById('inp-ylabel').value||'';
 
   gctx.fillStyle='#111';
-  if(xl){ gctx.font='bold 12px Times New Roman'; gctx.textAlign='center'; gctx.fillText(xl,M.left+pW()/2,H-6); }
+  if(xl){ gctx.font=`bold ${fsl}px Times New Roman`; gctx.textAlign='center'; gctx.fillText(xl,M.left+pW()/2,H-6); }
   if(yl){
-    gctx.save(); gctx.translate(14,M.top+pH()/2); gctx.rotate(-Math.PI/2);
-    gctx.font='bold 12px Times New Roman'; gctx.textAlign='center'; gctx.fillText(yl,0,0);
+    gctx.save(); gctx.translate(Math.round(fsl*1.1),M.top+pH()/2); gctx.rotate(-Math.PI/2);
+    gctx.font=`bold ${fsl}px Times New Roman`; gctx.textAlign='center'; gctx.fillText(yl,0,0);
     gctx.restore();
   }
 }
@@ -626,7 +845,6 @@ function barGeom(catIdx, serIdx){
 // ════════════════════════════════════════════════
 function drawData(){
   dctx.clearRect(0,0,W,H);
-  // clip to plot area
   dctx.save();
   dctx.beginPath();
   dctx.rect(M.left,M.top,pW(),pH());
@@ -644,15 +862,13 @@ function drawBars(){
   drawBarsGrouped();
 }
 
-// ── Histogram helpers ─────────────────────────
 function histBinStart()  { return parseFloat(document.getElementById('inp-binstart').value)  || 0; }
 function histBinWidth()  { return Math.max(0.01, parseFloat(document.getElementById('inp-binwidth').value) || 1); }
 function histBinCount()  { return Math.max(1, Math.min(20, parseInt(document.getElementById('inp-bincount').value) || 5)); }
 
-// Returns array of {left, right, freq} for each bin
 function histBins(){
   const start = histBinStart(), bw = histBinWidth(), n = histBinCount();
-  const s = series[0]; // histogram uses only one series
+  const s = series[0];
   const bins = [];
   for(let i=0; i<n; i++){
     const left  = start + i * bw;
@@ -685,7 +901,6 @@ function drawHistogram(){
     dctx.strokeRect(bx, top, bw, bh);
   });
 
-  // draw empty bin outlines so students can see the grid they're filling
   bins.forEach(bin => {
     if(bin.freq !== 0) return;
     const bx  = dx(bin.left);
@@ -699,7 +914,6 @@ function drawHistogram(){
 }
 
 function drawBarsGrouped(){
-  // bars grow from y=0 (or the nearest visible edge if 0 is out of range)
   const baselineData = Math.max(yMin(), Math.min(yMax(), 0));
   series.forEach((s,si)=>{
     categories.forEach((cat,ci)=>{
@@ -713,10 +927,8 @@ function drawBarsGrouped(){
       dctx.fillStyle   = s.color+'cc';
       dctx.strokeStyle = darken(s.color);
       dctx.lineWidth   = 1;
-      // handle negative bars (bh < 0 means bar goes downward)
       dctx.fillRect(bx,   Math.min(by,ty), bw, Math.abs(bh));
       dctx.strokeRect(bx, Math.min(by,ty), bw, Math.abs(bh));
-      // error bar
       if(pt.err && pt.err>0){
         const ex = bx+bw/2;
         const ey1 = dy(pt.y+pt.err);
@@ -737,7 +949,6 @@ function drawLines(){
   series.forEach(s=>{
     if(!s.points.length) return;
     const sorted = [...s.points].sort((a,b)=>a.x-b.x);
-    // line
     dctx.strokeStyle=s.color; dctx.lineWidth=2;
     dctx.beginPath();
     sorted.forEach((pt,i)=>{
@@ -745,7 +956,6 @@ function drawLines(){
       i===0?dctx.moveTo(x,y):dctx.lineTo(x,y);
     });
     dctx.stroke();
-    // dots + error bars
     sorted.forEach(pt=>{
       const x=dx(pt.x), y=dy(pt.y);
       if(pt.err&&pt.err>0){
@@ -779,7 +989,6 @@ function drawScatter(){
       }
       drawMarker(dctx,x,y,SHAPES[si%SHAPES.length],s.color);
     });
-    // best-fit line
     if(showBestFit && s.points.length>=2){
       drawBestFit(dctx, s.points, s.color);
     }
@@ -810,7 +1019,9 @@ function drawMarker(ctx,x,y,shape,color){
   ctx.fill(); ctx.stroke();
 }
 
-function drawBestFit(ctx, pts, color){
+function drawBestFit(ctx, pts, color, dxFn, dyFn, xMinFn, xMaxFn){
+  dxFn   = dxFn   || dx;   dyFn   = dyFn   || dy;
+  xMinFn = xMinFn || xMin; xMaxFn = xMaxFn || xMax;
   const n = pts.length;
   const mx = pts.reduce((s,p)=>s+p.x,0)/n;
   const my = pts.reduce((s,p)=>s+p.y,0)/n;
@@ -820,7 +1031,7 @@ function drawBestFit(ctx, pts, color){
   const slope = num/den;
   const intercept = my - slope*mx;
 
-  const x1=xMin(), x2=xMax();
+  const x1=xMinFn(), x2=xMaxFn();
   const y1=slope*x1+intercept;
   const y2=slope*x2+intercept;
 
@@ -828,11 +1039,10 @@ function drawBestFit(ctx, pts, color){
   ctx.setLineDash([6,4]);
   ctx.strokeStyle=color; ctx.lineWidth=1.8; ctx.globalAlpha=0.75;
   ctx.beginPath();
-  ctx.moveTo(dx(x1),dy(y1)); ctx.lineTo(dx(x2),dy(y2));
+  ctx.moveTo(dxFn(x1),dyFn(y1)); ctx.lineTo(dxFn(x2),dyFn(y2));
   ctx.stroke();
   ctx.restore();
 
-  // r² label
   const pts2 = pts.map(p=>p.y-(slope*p.x+intercept));
   const ss_res = pts2.reduce((s,v)=>s+v*v,0);
   const ss_tot = pts.reduce((s,p)=>s+(p.y-my)**2,0);
@@ -842,58 +1052,62 @@ function drawBestFit(ctx, pts, color){
 }
 
 // ════════════════════════════════════════════════
-//  DRAW OVERLAY (legend)
+//  HTML LEGEND (outside graph canvas)
 // ════════════════════════════════════════════════
 function drawOverlay(){
   octx.clearRect(0,0,W,H);
-  // show legend if >1 series or series has been renamed
-  const showLeg = series.length>1 || series[0].label!=='Series 1';
-  if(!showLeg) return;
+}
 
-  const lineH=18, padX=8, padY=6;
-  const labels = series.map(s=>s.label);
-  const maxLW = Math.max(...labels.map(l=>{ octx.font='11px Times New Roman'; return octx.measureText(l).width; }));
-  const boxW = Math.min(maxLW+38, pW()-8);
-  const boxH = series.length*lineH + padY*2;
-  const bx = M.left+pW()-boxW-2;
-  const by = M.top+4;
+function renderHtmlLegend(){
+  const el = document.getElementById('html-legend');
+  if(graphType === 'histogram'){ el.style.display = 'none'; return; }
 
-  octx.fillStyle='rgba(255,255,255,0.9)';
-  octx.strokeStyle='#888'; octx.lineWidth=1;
-  octx.fillRect(bx,by,boxW,boxH);
-  octx.strokeRect(bx,by,boxW,boxH);
+  el.style.display = 'flex';
+  el.innerHTML = '';
+  if(series.length < 2) return;
 
-  series.forEach((s,si)=>{
-    const iy = by+padY+si*lineH+lineH/2;
-    if(graphType==='scatter'){
-      drawMarker(octx, bx+13, iy, SHAPES[si%SHAPES.length], s.color);
-    } else {
-      octx.fillStyle=s.color;
-      octx.fillRect(bx+5,iy-5,15,10);
-      octx.strokeStyle=darken(s.color); octx.lineWidth=0.8;
-      octx.strokeRect(bx+5,iy-5,15,10);
-    }
-    octx.fillStyle='#111'; octx.font='11px Times New Roman'; octx.textAlign='left';
-    octx.fillText(s.label, bx+25, iy+4);
+  series.forEach((s, si) => {
+    const item = document.createElement('div');
+    item.className = 'hl-item';
+
+    const swatch = document.createElement('div');
+    swatch.className = 'hl-swatch';
+    swatch.style.background = s.color;
+    swatch.style.borderColor = darken(s.color);
+    item.appendChild(swatch);
+
+    const label = document.createElement('span');
+    label.textContent = s.label;
+    item.appendChild(label);
+    el.appendChild(item);
   });
 }
 
-function redraw(){ drawGrid(); drawData(); drawOverlay(); }
+function redraw(){ drawGrid(); drawData(); drawOverlay(); renderHtmlLegend(); }
 
 // ════════════════════════════════════════════════
 //  MOUSE / TOUCH
 // ════════════════════════════════════════════════
 let dragging = false;
-let errDrag  = null;  // { ptIdx, anchorY (px), anchorDataY }
+let errDrag  = null;
+
+function canvasCoords(e){
+  const r = dc.getBoundingClientRect();
+  const sx = dc.width  / r.width;
+  const sy = dc.height / r.height;
+  return { px: (e.clientX - r.left) * sx, py: (e.clientY - r.top) * sy };
+}
 
 dc.addEventListener('mousedown', e => {
-  const r  = dc.getBoundingClientRect();
-  const px = e.clientX - r.left;
-  const py = e.clientY - r.top;
+  const { px, py } = canvasCoords(e);
   if(!inPlot(px, py)) return;
 
+  if(deleteMode){
+    deleteNearest(px, py);
+    return;
+  }
+
   if(errorMode){
-    // find nearest point to start a drag from
     const s = series[activeSer];
     let nearest = -1, bestD = Infinity;
     s.points.forEach((pt, i) => {
@@ -916,12 +1130,9 @@ dc.addEventListener('mousedown', e => {
 });
 
 dc.addEventListener('mousemove', e => {
-  const r  = dc.getBoundingClientRect();
-  const px = e.clientX - r.left;
-  const py = e.clientY - r.top;
+  const { px, py } = canvasCoords(e);
 
   if(errDrag !== null){
-    // live-update error bar while dragging
     const draggedY  = px2y(py);
     const errVal    = Math.abs(draggedY - errDrag.anchorDataY);
     series[activeSer].points[errDrag.ptIdx].err = parseFloat(errVal.toFixed(3));
@@ -933,22 +1144,20 @@ dc.addEventListener('mousemove', e => {
   if(inPlot(px, py)){
     dc.style.cursor = errorMode ? 'cell' : 'crosshair';
     if(errorMode) status('Error-bar mode — click a point then drag to set ± size.');
-    else status('Click to add a point.');
+    else status('Click to add a point. Right-click to delete.');
     if(dragging && !errorMode && graphType !== 'bar') handlePlotClick(px, py);
-    // histogram: also allow drag to set height
     if(dragging && graphType === 'histogram') handlePlotClick(px, py);
   } else {
     dc.style.cursor = 'default';
     status(errorMode
       ? 'Error-bar mode — click a data point and drag to set ± error.'
-      : 'Click inside the plot area to add data.');
+      : 'Click inside the plot area to add data. Right-click to delete.');
   }
 });
 
 dc.addEventListener('mouseup', e => {
   if(errDrag !== null){
-    const r  = dc.getBoundingClientRect();
-    const py = e.clientY - r.top;
+    const { py } = canvasCoords(e);
     const draggedY = px2y(py);
     const errVal   = Math.abs(draggedY - errDrag.anchorDataY);
     series[activeSer].points[errDrag.ptIdx].err = parseFloat(errVal.toFixed(3));
@@ -966,7 +1175,9 @@ dc.addEventListener('touchstart', e => {
   e.preventDefault();
   const t  = e.touches[0];
   const r  = dc.getBoundingClientRect();
-  handlePlotClick(t.clientX - r.left, t.clientY - r.top);
+  const sx = dc.width  / r.width;
+  const sy = dc.height / r.height;
+  handlePlotClick((t.clientX - r.left) * sx, (t.clientY - r.top) * sy);
 }, { passive: false });
 
 function handlePlotClick(px, py){
@@ -1031,7 +1242,6 @@ function addCategory(){
 
 function removeCategory(i){
   categories.splice(i,1);
-  // purge points that referenced this category index, shift higher ones
   series.forEach(s=>{
     s.points = s.points
       .filter(p=>p.cat!==i)
@@ -1060,8 +1270,7 @@ function addSeries(){
   if(series.length>=6){ status('Max 6 series.'); return; }
   series.push({ label:`Series ${series.length+1}`, color:COLORS[series.length%COLORS.length], points:[], errors:[] });
   activeSer=series.length-1;
-  // show picker once there are 2+ series
-  if(graphType !== 'bar') document.getElementById('bar-ser-picker').style.display = 'flex';
+  if(graphType !== 'histogram') document.getElementById('bar-ser-picker').style.display = 'flex';
   renderSerSelect();
   renderLegList();
   redraw();
@@ -1069,8 +1278,6 @@ function addSeries(){
 
 function setActiveSeries(i){
   activeSer=i;
-  
-  document.getElementById('ser-sel').value=i;
   renderBarSerPicker();
   status(`Drawing on: ${series[i].label}`);
 }
@@ -1089,26 +1296,18 @@ function removeSeries(i){
   if(series.length===1){ status('Cannot remove the last series.'); return; }
   series.splice(i,1);
   if(activeSer>=series.length) activeSer=series.length-1;
-  if(graphType !== 'bar' && series.length < 2){
-    document.getElementById('bar-ser-picker').style.display = 'none';
-  }
   renderSerSelect();
   renderLegList();
   redraw();
 }
 
 function renderSerSelect(){
-  const sel=document.getElementById('ser-sel');
-  sel.innerHTML=series.map((s,i)=>`<option value="${i}"${i===activeSer?' selected':''}>${s.label}</option>`).join('');
-  
   renderBarSerPicker();
 }
 
 function renderBarSerPicker(){
   const picker = document.getElementById('bar-ser-picker');
-  // keep the label span, replace everything after it
   const label = picker.querySelector('.bsp-label');
-  // remove old buttons
   [...picker.querySelectorAll('.bsp-btn')].forEach(b => b.remove());
   series.forEach((s, i) => {
     const btn = document.createElement('button');
@@ -1140,7 +1339,6 @@ function renderLegList(){
 function onGroupsChange(){
   const n = Math.max(1, Math.min(6, parseInt(document.getElementById('inp-groups').value)||1));
   document.getElementById('inp-groups').value = n;
-  // Sync series count to match requested groups
   while(series.length < n){
     series.push({ label:`Series ${series.length+1}`, color:COLORS[series.length%COLORS.length], points:[], errors:[] });
   }
@@ -1148,9 +1346,8 @@ function onGroupsChange(){
     series.pop();
   }
   if(activeSer >= series.length) activeSer = series.length - 1;
-  // legend always visible; picker only needed with >1 group
   document.getElementById('leg-section').style.display = 'block';
-  document.getElementById('bar-ser-picker').style.display = n > 1 ? 'flex' : 'none';
+  if(graphType !== 'histogram') document.getElementById('bar-ser-picker').style.display = 'flex';
   renderSerSelect();
   renderLegList();
   redraw();
@@ -1158,20 +1355,19 @@ function onGroupsChange(){
 
 function setScaleDefaults(type){
   if(type === 'bar'){
-    document.getElementById('inp-ymin').value  = '-5';
-    document.getElementById('inp-ymax').value  = '5';
+    document.getElementById('inp-ymin').value  = '-10';
+    document.getElementById('inp-ymax').value  = '10';
     document.getElementById('inp-ystep').value = '1';
   } else if(type === 'histogram'){
     document.getElementById('inp-ymin').value  = '0';
     document.getElementById('inp-ymax').value  = '10';
     document.getElementById('inp-ystep').value = '1';
   } else {
-    // line / scatter
-    document.getElementById('inp-xmin').value  = '-5';
-    document.getElementById('inp-xmax').value  = '5';
+    document.getElementById('inp-xmin').value  = '-10';
+    document.getElementById('inp-xmax').value  = '10';
     document.getElementById('inp-xstep').value = '1';
-    document.getElementById('inp-ymin').value  = '-5';
-    document.getElementById('inp-ymax').value  = '5';
+    document.getElementById('inp-ymin').value  = '-10';
+    document.getElementById('inp-ymax').value  = '10';
     document.getElementById('inp-ystep').value = '1';
   }
 }
@@ -1186,64 +1382,40 @@ function setType(t){
   const isCat  = (t === 'bar');
   const isHist = (t === 'histogram');
 
-  // section visibility
   document.getElementById('cat-section').style.display  = isCat  ? 'block' : 'none';
   document.getElementById('hist-section').style.display = isHist ? 'block' : 'none';
 
-  // legend: always shown, but histogram gets simplified color-only UI
   document.getElementById('leg-section').style.display  = 'block';
   document.getElementById('leg-normal').style.display   = isHist ? 'none' : 'block';
   document.getElementById('leg-hist').style.display     = isHist ? 'block' : 'none';
   if(isHist) document.getElementById('hist-color').value = series[0].color;
   document.getElementById('tg-addseries').style.display = (isCat || isHist) ? 'none' : '';
 
-  // x numeric scale inputs — only for line/scatter (histogram uses bin params, bar uses categories)
   const showXScale = (!isCat && !isHist);
-  ['inp-xmin','inp-xmax','xmax-lbl','inp-xstep','xstep-lbl','xscale-lbl'].forEach(id => {
-    document.getElementById(id).style.display = showXScale ? '' : 'none';
-  });
+  const xrow = document.getElementById('xscale-row');
+  xrow.style.display    = showXScale ? 'flex' : 'none';
+  xrow.style.flexWrap   = 'nowrap';
 
-  // series picker
-  if(isCat){
-    const n = parseInt(document.getElementById('inp-groups').value)||1;
-    document.getElementById('bar-ser-picker').style.display = n > 1 ? 'flex' : 'none';
-  } else if(isHist){
-    document.getElementById('bar-ser-picker').style.display = 'none';
-  } else {
-    document.getElementById('bar-ser-picker').style.display = series.length > 1 ? 'flex' : 'none';
-  }
+  document.getElementById('bar-ser-picker').style.display = isHist ? 'none' : 'flex';
 
-  // hide series label + dropdown in histogram (color swatch stays)
-  document.getElementById('ser-label').style.display = isHist ? 'none' : '';
-  document.getElementById('ser-sel').style.display   = isHist ? 'none' : '';
-
-  // best-fit only for scatter
   document.getElementById('btn-bf').style.opacity = t === 'scatter' ? '1' : '0.4';
 
-  // error bars not applicable to histogram
   document.getElementById('btn-eb').style.opacity = isHist ? '0.4' : '1';
   if(isHist && errorMode){ errorMode = false; document.getElementById('btn-eb').classList.remove('active'); }
 
-  // histogram resets to 1 series; sync color swatch
   if(isHist){
     series = [{ label: series[0].label, color: series[0].color, points: [], errors: [] }];
     activeSer = 0;
-    
   }
 
-  // apply sensible scale defaults for the new type
   setScaleDefaults(t);
 
-  // reset series to match groups setting when switching to bar
   if(isCat) onGroupsChange();
 
-  // clear all points on type switch
   series.forEach(s => s.points = []);
 
-  // show category hint if entering bar mode with no categories yet
   updateCatHint(isCat && categories.length === 0);
 
-  // show histogram hint
   document.getElementById('hist-hint').style.display = isHist ? 'block' : 'none';
 
   renderSerSelect();
@@ -1259,12 +1431,70 @@ function toggleBestFit(){
   redraw();
 }
 
+function toggleDeleteMode(){
+  deleteMode = !deleteMode;
+  if(deleteMode && errorMode){ errorMode = false; document.getElementById('btn-eb').classList.remove('active'); }
+  document.getElementById('btn-delete').classList.toggle('active', deleteMode);
+  dc.style.cursor = deleteMode ? 'not-allowed' : 'crosshair';
+  status(deleteMode
+    ? '🗑 Delete mode ON — click a bar or point to remove it. Click 🗑 Delete again to exit.'
+    : 'Delete mode off.');
+}
+
 function toggleErrorBars(){
   errorMode=!errorMode;
   document.getElementById('btn-eb').classList.toggle('active',errorMode);
   status(errorMode
     ? '± Error mode ON — click a data point to enter its error value. Click ± Error again to exit.'
     : 'Error-bar mode off.');
+}
+
+function deleteNearest(px, py){
+  const HIT = Math.max(20, W * 0.04);
+
+  if(graphType === 'bar'){
+    if(!categories.length) return;
+    const ci = Math.floor((px - M.left) / pW() * categories.length);
+    if(ci < 0 || ci >= categories.length) return;
+    const idx = series[activeSer].points.findIndex(p => p.cat === ci);
+    if(idx !== -1){
+      series[activeSer].points.splice(idx, 1);
+      status(`Removed "${categories[ci]}" bar from ${series[activeSer].label}.`);
+      redraw();
+    } else {
+      status('No bar found in that column.');
+    }
+
+  } else if(graphType === 'histogram'){
+    const start = histBinStart(), bw = histBinWidth(), n = histBinCount();
+    const xv = px2x(px);
+    const binIdx = Math.floor((xv - start) / bw);
+    if(binIdx < 0 || binIdx >= n) return;
+    const idx = series[0].points.findIndex(p => p.binIdx === binIdx);
+    if(idx !== -1){
+      series[0].points.splice(idx, 1);
+      status(`Cleared bin ${binIdx + 1}.`);
+      redraw();
+    } else {
+      status('That bin is already empty.');
+    }
+
+  } else {
+    let bestDist = Infinity, bestSer = -1, bestIdx = -1;
+    series.forEach((s, si) => {
+      s.points.forEach((pt, pi) => {
+        const d = Math.hypot(px - dx(pt.x), py - dy(pt.y));
+        if(d < bestDist){ bestDist = d; bestSer = si; bestIdx = pi; }
+      });
+    });
+    if(bestDist <= HIT && bestSer !== -1){
+      series[bestSer].points.splice(bestIdx, 1);
+      status(`Point removed from ${series[bestSer].label}.`);
+      redraw();
+    } else {
+      status('Click closer to a point to delete it.');
+    }
+  }
 }
 
 function undoLast(){
@@ -1285,24 +1515,73 @@ function clearAll(){
 // ════════════════════════════════════════════════
 //  COMPOSE FINAL IMAGE (all 3 layers)
 // ════════════════════════════════════════════════
+const EXPORT_SIZE = 500;
+
 function compositeCanvas(){
-  const tmp=document.createElement('canvas');
-  tmp.width=W; tmp.height=H;
-  const t=tmp.getContext('2d');
-  t.fillStyle='#fff'; t.fillRect(0,0,W,H);
-  t.drawImage(gc,0,0);
-  t.drawImage(dc,0,0);
-  t.drawImage(oc,0,0);
+  const legendEl = document.getElementById('html-legend');
+  const showLeg  = legendEl.style.display !== 'none' && legendEl.children.length > 0;
+  const legH     = showLeg ? 26 : 0;
+  const EX = EXPORT_SIZE;
+
+  const savedW = W, savedH = H;
+
+  W = EX; H = EX;
+  [gc, dc, oc].forEach(c => { c.width = EX; c.height = EX; });
+  drawGrid(); drawData(); drawOverlay();
+
+  const tmp = document.createElement('canvas');
+  tmp.width = EX; tmp.height = EX + legH;
+  const t = tmp.getContext('2d');
+  t.fillStyle = '#fff'; t.fillRect(0, 0, EX, EX + legH);
+
+  if(showLeg){
+    t.fillStyle = '#f9fafc';
+    t.fillRect(0, 0, EX, legH);
+    t.strokeStyle = '#e4e8ef'; t.lineWidth = 1;
+    t.beginPath(); t.moveTo(0, legH); t.lineTo(EX, legH); t.stroke();
+    const items = [...legendEl.querySelectorAll('.hl-item')];
+    const totalW = items.reduce((sum, item) => {
+      t.font = '11px system-ui, Arial, sans-serif';
+      return sum + 16 + 5 + t.measureText(item.querySelector('span').textContent).width + 14;
+    }, -14);
+    let cx = (EX - totalW) / 2;
+    items.forEach((item, si) => {
+      const label = item.querySelector('span').textContent;
+      const color = series[si].color;
+      if(graphType === 'scatter'){
+        drawMarker(t, cx + 8, legH/2, SHAPES[si % SHAPES.length], color);
+      } else {
+        t.fillStyle = color; t.fillRect(cx, legH/2 - 6, 16, 12);
+        t.strokeStyle = darken(color); t.lineWidth = 0.8; t.strokeRect(cx, legH/2 - 6, 16, 12);
+      }
+      t.fillStyle = '#1e2a3a'; t.font = '11px system-ui, Arial, sans-serif';
+      t.textAlign = 'left'; t.textBaseline = 'middle';
+      t.fillText(label, cx + 21, legH/2);
+      cx += 16 + 5 + t.measureText(label).width + 14;
+    });
+  }
+
+  t.drawImage(gc, 0, legH);
+  t.drawImage(dc, 0, legH);
+  t.drawImage(oc, 0, legH);
+
+  W = savedW; H = savedH;
+  [gc, dc, oc].forEach(c => { c.width = savedW; c.height = savedH; });
+  drawGrid(); drawData(); drawOverlay();
+
   return tmp;
 }
 
 async function downloadPNG(){
   const tmp = compositeCanvas();
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const stamp = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
   const a = document.createElement('a');
-  a.download = 'ap-bio-graph.png';
+  a.download = `Graph_${stamp}.png`;
   a.href = tmp.toDataURL('image/png');
   a.click();
-  status('✓ Graph downloaded as ap-bio-graph.png — attach it in Synergy.');
+  status(`✓ Downloaded as Graph_${stamp}.png — attach it in Synergy.`);
 }
 
 async function copyPNG(){
@@ -1312,7 +1591,6 @@ async function copyPNG(){
       await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
       status('✓ Graph copied to clipboard — paste it into Synergy\'s answer field.');
     } catch(err){
-      // fallback: open in new tab
       const url=URL.createObjectURL(blob);
       window.open(url,'_blank');
       status('Clipboard blocked by browser — graph opened in new tab. Right-click → Save/Copy Image.');
@@ -1323,11 +1601,25 @@ async function copyPNG(){
 // ════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════
-setType('bar');          // sets up UI, applies bar defaults, hides x scale fields
+activeLabelInput = document.getElementById('inp-xlabel');
+setType('bar');
 renderSerSelect();
 renderLegList();
-redraw();
-status('Choose a graph type, set your axis labels and scale, then click the plot to add data.');
+
+requestAnimationFrame(() => {
+  resizeCanvases();
+  redraw();
+  setTimeout(() => {
+    resizeCanvases();
+    redraw();
+  }, 50);
+  window.addEventListener('resize', () => {
+    resizeCanvases();
+    redraw();
+  });
+});
+
+status('');
 </script>
 </body>
 </html>
