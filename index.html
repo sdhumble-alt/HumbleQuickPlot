@@ -141,6 +141,15 @@ canvas { position: absolute; top: 0; left: 0; }
 #dc { cursor: crosshair; }
 #oc { pointer-events: none; }
 
+/* ── LOCKED CONTROLS WRAPPER ── */
+.controls-locked {
+  opacity: 0.35;
+  pointer-events: none;
+  user-select: none;
+  filter: grayscale(0.5);
+  transition: opacity 0.2s, filter 0.2s;
+}
+
 /* ── SECTIONS ── */
 .section {
   border-top: 1px solid #e4e8ef;
@@ -173,16 +182,6 @@ canvas { position: absolute; top: 0; left: 0; }
   font-size: 10px; color: #6b7a90;
   white-space: nowrap; flex-shrink: 0;
 }
-
-/* Quick Symbol Chips */
-.sym-chip {
-  font-family: system-ui, -apple-system, sans-serif;
-  font-size: 10px; font-weight: 500;
-  padding: 2px 6px; border: 1px solid #c8d0dc; background: #fff;
-  cursor: pointer; border-radius: 4px; color: #1e2a3a;
-  transition: background 0.1s, border-color 0.1s;
-}
-.sym-chip:hover { background: #edf0f5; border-color: #a8b4c4; }
 
 /* ── CATEGORY EDITOR ── */
 #cat-section { display: none; }
@@ -360,144 +359,140 @@ canvas { position: absolute; top: 0; left: 0; }
   <!-- ══ TOOLBAR ══ -->
   <div id="toolbar">
 
-    <!-- Row 1: Graph type buttons -->
+    <!-- Row 1: Graph type buttons (always accessible) -->
     <div class="tb-row">
       <div class="tg">
         <span class="tg-label">Type:</span>
-        <button class="tb active" id="btn-bar"       onclick="setType('bar')">Bar</button>
-        <button class="tb"        id="btn-line"      onclick="setType('line')">Line</button>
-        <button class="tb"        id="btn-scatter"   onclick="setType('scatter')">Scatter</button>
-        <button class="tb"        id="btn-histogram" onclick="setType('histogram')">Histogram</button>
+        <button class="tb" id="btn-bar"       onclick="setType('bar')">Bar</button>
+        <button class="tb" id="btn-line"      onclick="setType('line')">Line</button>
+        <button class="tb" id="btn-scatter"   onclick="setType('scatter')">Scatter</button>
+        <button class="tb" id="btn-histogram" onclick="setType('histogram')">Histogram</button>
       </div>
     </div>
 
-    <!-- Row 2: Tools (Best Fit & Error) -->
-    <div class="tb-row" style="justify-content: center;">
-      <div class="tg">
-        <button class="tb" id="btn-bf" onclick="toggleBestFit()" title="Toggle best-fit line (scatter)">Best Fit</button>
-        <button class="tb" id="btn-eb" onclick="toggleErrorBars()" title="Toggle error bar entry mode">± Error</button>
+    <!-- Secondary tools (locked until type selected) -->
+    <div id="secondary-tools" class="controls-locked">
+      <!-- Row 2: Tools (Best Fit & Error) -->
+      <div class="tb-row" style="justify-content: center; margin-top: 5px;">
+        <div class="tg">
+          <button class="tb" id="btn-bf" onclick="toggleBestFit()" title="Toggle best-fit line (scatter)">Best Fit</button>
+          <button class="tb" id="btn-eb" onclick="toggleErrorBars()" title="Toggle error bar entry mode">± Error</button>
+        </div>
       </div>
-    </div>
 
-    <!-- Row 3: + Series + Undo + Delete + Clear -->
-    <div class="tb-row" style="justify-content: center;">
-      <div class="tg" id="tg-addseries">
-        <button class="tb" onclick="addSeries()">+ Series</button>
-      </div>
-      <div class="tg" style="border-left:none; padding-left:3px; margin-left:0;">
-        <button class="tb" onclick="undoLast()">↩ Undo</button>
-        <button class="tb" id="btn-delete" onclick="toggleDeleteMode()" title="Toggle delete mode">🗑</button>
-        <button class="tb red" onclick="clearAll()">✕ Clear All</button>
+      <!-- Row 3: + Series + Undo + Delete + Clear -->
+      <div class="tb-row" style="justify-content: center; margin-top: 5px;">
+        <div class="tg" id="tg-addseries">
+          <button class="tb" onclick="addSeries()">+ Series</button>
+        </div>
+        <div class="tg" style="border-left:none; padding-left:3px; margin-left:0;">
+          <button class="tb" onclick="undoLast()">↩ Undo</button>
+          <button class="tb" id="btn-delete" onclick="toggleDeleteMode()" title="Toggle delete mode">🗑</button>
+          <button class="tb red" onclick="clearAll()">✕ Clear All</button>
+        </div>
       </div>
     </div>
 
   </div><!-- #toolbar -->
 
-    <!-- ══ AXIS LABELS + SCALE ══ -->
-    <div class="section">
-      <div class="row">
-        <label>X-Axis Label:</label>
-        <input type="text" id="inp-xlabel" placeholder="" oninput="onXLabelChange()" onfocus="activeLabelInput=this">
-      </div>
-      <div class="row" id="xscale-row" style="display:none; flex-wrap:nowrap; justify-content:center;">
-        <span class="mini-label" id="xscale-lbl">Min:</span>
-        <input type="number" id="inp-xmin" value="-10" oninput="redraw()" style="width:50px">
-        <span class="mini-label" id="xmax-lbl">Max:</span>
-        <input type="number" id="inp-xmax" value="10" oninput="redraw()" style="width:50px">
-        <span class="mini-label" id="xstep-lbl">Step:</span>
-        <input type="number" id="inp-xstep" value="1" oninput="redraw()" style="width:50px">
-      </div>
-      <hr style="border:none; border-top:1px dotted #c8d0dc; margin:5px 0;">
-      <div class="row">
-        <label>Y-Axis Label:</label>
-        <input type="text" id="inp-ylabel" placeholder="" oninput="redraw()" onfocus="activeLabelInput=this">
-      </div>
-      <div class="row" style="flex-wrap:nowrap; justify-content:center;">
-        <span class="mini-label">Min:</span>
-        <input type="number" id="inp-ymin" value="-10" oninput="redraw()" style="width:50px">
-        <span class="mini-label">Max:</span>
-        <input type="number" id="inp-ymax" value="10" oninput="redraw()" style="width:50px">
-        <span class="mini-label">Step:</span>
-        <input type="number" id="inp-ystep" value="1" oninput="redraw()" style="width:50px">
-      </div>
-      <hr style="border:none; border-top:1px dotted #c8d0dc; margin:5px 0;">
-      <!-- Quick Symbols Toolbar Row -->
-      <div class="row" style="align-items: center; justify-content: center; gap: 3px;">
-        <span class="mini-label" style="margin-right: 2px;">Symbols:</span>
-        <button type="button" class="sym-chip" onclick="insertSymbol('°C')">°C</button>
-        <button type="button" class="sym-chip" onclick="insertSymbol('μL')">μL</button>
-        <button type="button" class="sym-chip" onclick="insertSymbol('O₂')">O₂</button>
-        <button type="button" class="sym-chip" onclick="insertSymbol('CO₂')">CO₂</button>
-        <button type="button" class="sym-chip" onclick="insertSymbol('±')">±</button>
-        <button type="button" class="sym-chip" onclick="insertSymbol('Δ')">Δ</button>
-        <button type="button" class="sym-chip" onclick="insertSymbol('μm')">μm</button>
-      </div>
-    </div>
+    <!-- ══ MAIN CONFIG WRAPPER (locked until type selected) ══ -->
+    <div id="main-config" class="controls-locked">
 
-    <!-- ══ LEGEND EDITOR ══ -->
-    <div class="section" id="leg-section">
-      <div id="leg-normal">
-        <div class="leg-hdr">
-          <span>Legend / Series</span>
-          <button class="tb" onclick="addSeries()">+ Add Series</button>
-        </div>
-        <div id="leg-list"></div>
-      </div>
-      <div id="leg-hist" style="display:none">
+      <!-- ══ AXIS LABELS + SCALE ══ -->
+      <div class="section">
         <div class="row">
-          <label>Bar Color:</label>
-          <input type="color" value="#1a56b8" id="hist-color"
-            onchange="series[0].color=this.value; redraw()">
+          <label>X-Axis Label:</label>
+          <input type="text" id="inp-xlabel" placeholder="" oninput="onXLabelChange()">
+        </div>
+        <div class="row" id="xscale-row" style="display:none; flex-wrap:nowrap; justify-content:center;">
+          <span class="mini-label" id="xscale-lbl">Min:</span>
+          <input type="number" id="inp-xmin" value="0" oninput="redraw()" style="width:50px">
+          <span class="mini-label" id="xmax-lbl">Max:</span>
+          <input type="number" id="inp-xmax" value="10" oninput="redraw()" style="width:50px">
+          <span class="mini-label" id="xstep-lbl">Step:</span>
+          <input type="number" id="inp-xstep" value="" oninput="redraw()" style="width:50px">
+        </div>
+        <hr style="border:none; border-top:1px dotted #c8d0dc; margin:5px 0;">
+        <div class="row">
+          <label>Y-Axis Label:</label>
+          <input type="text" id="inp-ylabel" placeholder="" oninput="redraw()">
+        </div>
+        <div class="row" style="flex-wrap:nowrap; justify-content:center;">
+          <span class="mini-label">Min:</span>
+          <input type="number" id="inp-ymin" value="-10" oninput="redraw()" style="width:50px">
+          <span class="mini-label">Max:</span>
+          <input type="number" id="inp-ymax" value="10" oninput="redraw()" style="width:50px">
+          <span class="mini-label">Step:</span>
+          <input type="number" id="inp-ystep" value="1" oninput="redraw()" style="width:50px">
         </div>
       </div>
-    </div>
 
-    <!-- ══ CATEGORY EDITOR (bar only) ══ -->
-    <div class="section" id="cat-section">
-      <div class="row">
-        <label>Bar Style:</label>
-        <span class="mini-label">Groups:</span>
-        <input type="number" id="inp-groups" value="1" min="1" max="6" step="1"
-          style="width:42px" oninput="onGroupsChange()">
+      <!-- ══ LEGEND EDITOR ══ -->
+      <div class="section" id="leg-section">
+        <div id="leg-normal">
+          <div class="leg-hdr">
+            <span>Legend / Series</span>
+            <button class="tb" onclick="addSeries()">+ Add Series</button>
+          </div>
+          <div id="leg-list"></div>
+        </div>
+        <div id="leg-hist" style="display:none">
+          <div class="row">
+            <label>Bar Color:</label>
+            <input type="color" value="#1a56b8" id="hist-color"
+              onchange="series[0].color=this.value; redraw()">
+          </div>
+        </div>
       </div>
-      <div class="row" style="margin-bottom:0">
-        <label>X Categories:</label>
-        <span style="font-size:10px;color:#999;">Add a label for each bar</span>
-      </div>
-      <div id="cat-list"></div>
-      <div id="cat-input-wrap">
-        <input type="text" id="cat-input" placeholder="Type a category name…" onkeydown="if(event.key==='Enter')addCategory()">
-        <button onclick="addCategory()">+ Add</button>
-      </div>
-      <div id="cat-hint">↑ Type a category name and click + Add to build your graph</div>
-    </div>
 
-    <!-- ══ HISTOGRAM CONFIG ══ -->
-    <div class="section" id="hist-section" style="display:none">
-      <div class="row" style="flex-wrap:nowrap; justify-content:center;">
-        <span class="mini-label">Bin Start:</span>
-        <input type="number" id="inp-binstart" value="0" oninput="redraw()" style="width:50px">
-        <span class="mini-label">Width:</span>
-        <input type="number" id="inp-binwidth" value="1" min="0.01" oninput="redraw()" style="width:50px">
-        <span class="mini-label"># Bins:</span>
-        <input type="number" id="inp-bincount" value="5" min="1" max="20" oninput="redraw()" style="width:50px">
+      <!-- ══ CATEGORY EDITOR (bar only) ══ -->
+      <div class="section" id="cat-section">
+        <div class="row">
+          <label>Bar Style:</label>
+          <span class="mini-label">Groups:</span>
+          <input type="number" id="inp-groups" value="1" min="1" max="6" step="1"
+            style="width:42px" oninput="onGroupsChange()">
+        </div>
+        <div class="row" style="margin-bottom:0">
+          <label>X Categories:</label>
+          <span style="font-size:10px;color:#999;">Add a label for each bar</span>
+        </div>
+        <div id="cat-list"></div>
+        <div id="cat-input-wrap">
+          <input type="text" id="cat-input" placeholder="Type a category name…" onkeydown="if(event.key==='Enter')addCategory()">
+          <button onclick="addCategory()">+ Add</button>
+        </div>
+        <div id="cat-hint">↑ Type a category name and click + Add to build your graph</div>
       </div>
-      <div id="hist-hint" style="font-size:10px;color:#1d5fc4;margin-top:3px;display:none">
-        Set bin parameters above, then click each bin to enter its frequency
-      </div>
-    </div>
 
-    <!-- ══ EXPORT ══ -->
-    <div id="export-row">
-      <span>Export:</span>
-      <button class="tb" onclick="downloadPNG()">⬇ Download PNG</button>
-      <button class="tb green" onclick="copyPNG()" id="btn-copy">📋 Copy Image</button>
-    </div>
+      <!-- ══ HISTOGRAM CONFIG ══ -->
+      <div class="section" id="hist-section" style="display:none">
+        <div class="row" style="flex-wrap:nowrap; justify-content:center;">
+          <span class="mini-label">Bin Start:</span>
+          <input type="number" id="inp-binstart" value="0" oninput="redraw()" style="width:50px">
+          <span class="mini-label">Width:</span>
+          <input type="number" id="inp-binwidth" value="1" min="0.01" oninput="redraw()" style="width:50px">
+          <span class="mini-label"># Bins:</span>
+          <input type="number" id="inp-bincount" value="5" min="1" max="20" oninput="redraw()" style="width:50px">
+        </div>
+        <div id="hist-hint" style="font-size:10px;color:#1d5fc4;margin-top:3px;display:none">
+          Set bin parameters above, then click each bin to enter its frequency
+        </div>
+      </div>
+
+      <!-- ══ EXPORT ══ -->
+      <div id="export-row">
+        <span>Export:</span>
+        <button class="tb" onclick="downloadPNG()">⬇ Download PNG</button>
+        <button class="tb green" onclick="copyPNG()" id="btn-copy">📋 Copy Image</button>
+      </div>
+
+    </div><!-- #main-config -->
 
     <!-- ══ STATUS + VERSION ══ -->
     <div id="statusbar-row">
       <div id="statusbar"></div>
-      <div id="app-version">v1.2.5 &nbsp;·&nbsp; 08-14-2026</div>
+      <div id="app-version">v1.5.1 &nbsp;·&nbsp; 08-19-2026</div>
     </div>
 
   </div><!-- #left-panel -->
@@ -530,7 +525,6 @@ canvas { position: absolute; top: 0; left: 0; }
 // ════════════════════════════════════════════════
 let W = 800, H = 600;
 const M = { top: 36, right: 30, bottom: 62, left: 62 };
-let activeLabelInput = null;
 
 function resizeCanvases(){
   const header  = document.getElementById('app-header');
@@ -567,7 +561,7 @@ function resizeCanvases(){
 const COLORS = ['#1a56b8','#c0392b','#27ae60','#8e44ad','#e67e22','#16a085'];
 const SHAPES  = ['circle','square','triangle','diamond','cross','star'];
 
-let graphType   = 'bar';
+let graphType   = null;
 let activeSer   = 0;
 let showBestFit = false;
 let errorMode   = false;
@@ -603,20 +597,6 @@ function inPlot(px,py){
 }
 
 function status(msg){ /* intentionally blank for now */ }
-
-// Quick Symbol Insertion helper
-function insertSymbol(sym){
-  if(!activeLabelInput){
-    activeLabelInput = document.getElementById('inp-xlabel');
-  }
-  const start = activeLabelInput.selectionStart;
-  const end = activeLabelInput.selectionEnd;
-  const val = activeLabelInput.value;
-  activeLabelInput.value = val.substring(0, start) + sym + val.substring(end);
-  activeLabelInput.selectionStart = activeLabelInput.selectionEnd = start + sym.length;
-  activeLabelInput.focus();
-  redraw();
-}
 
 // ════════════════════════════════════════════════
 //  NICE TICK STEPS
@@ -665,7 +645,6 @@ function syncHistXScale(){
 }
 
 function drawGrid(){
-  syncHistXScale();
   gctx.clearRect(0,0,W,H);
   gctx.fillStyle='#fff'; gctx.fillRect(0,0,W,H);
 
@@ -677,47 +656,20 @@ function drawGrid(){
   gctx.strokeStyle='#111'; gctx.lineWidth=0.6;
   gctx.strokeRect(M.left,M.top,pW(),pH());
 
-  // ── FINE SUBDIVISION MINOR GRIDLINES ──
-  const yMajor = niceSteps(yMin(), yMax(), yStep());
-  if(yMajor.length >= 2){
-    const majorStep = yMajor[1] - yMajor[0];
-    const minorStep = majorStep / 5;
-    const startMinor = yMajor[0] - majorStep;
-    const endMinor = yMajor[yMajor.length - 1] + majorStep;
-    for(let v = startMinor; v <= endMinor + 1e-9; v += minorStep){
-      if(yMajor.some(m => Math.abs(m - v) < 1e-5)) continue;
-      const y = dy(v);
-      if(y < M.top || y > M.top + pH()) continue;
-      gctx.strokeStyle = '#f2f2f2';
-      gctx.lineWidth = 0.4;
-      gctx.beginPath();
-      gctx.moveTo(M.left, y);
-      gctx.lineTo(M.left + pW(), y);
-      gctx.stroke();
-    }
+  if(!graphType){
+    const cx = M.left + pW()/2;
+    const cy = M.top  + pH()/2;
+    gctx.save();
+    gctx.globalAlpha = 0.65;
+    gctx.fillStyle   = '#1d5fc4';
+    gctx.font        = `bold ${fsp + 1}px Arial`;
+    gctx.textAlign   = 'center';
+    gctx.fillText('Select Graph Type to Begin', cx, cy);
+    gctx.restore();
+    return;
   }
 
-  if(graphType !== 'bar' && graphType !== 'histogram'){
-    const xMajor = niceSteps(xMin(), xMax(), xStep());
-    if(xMajor.length >= 2){
-      const majorStep = xMajor[1] - xMajor[0];
-      const minorStep = majorStep / 5;
-      const startMinor = xMajor[0] - majorStep;
-      const endMinor = xMajor[xMajor.length - 1] + majorStep;
-      for(let v = startMinor; v <= endMinor + 1e-9; v += minorStep){
-        if(xMajor.some(m => Math.abs(m - v) < 1e-5)) continue;
-        const x = dx(v);
-        if(x < M.left || x > M.left + pW()) continue;
-        gctx.strokeStyle = '#f2f2f2';
-        gctx.lineWidth = 0.4;
-        gctx.beginPath();
-        gctx.moveTo(x, M.top);
-        gctx.lineTo(x, M.top + pH());
-        gctx.stroke();
-      }
-    }
-  }
-  // ──────────────────────────────────────
+  syncHistXScale();
 
   const drawXTick = (v,label) => {
     const x = dx(v);
@@ -845,6 +797,8 @@ function barGeom(catIdx, serIdx){
 // ════════════════════════════════════════════════
 function drawData(){
   dctx.clearRect(0,0,W,H);
+  if(!graphType) return;
+
   dctx.save();
   dctx.beginPath();
   dctx.rect(M.left,M.top,pW(),pH());
@@ -1060,7 +1014,7 @@ function drawOverlay(){
 
 function renderHtmlLegend(){
   const el = document.getElementById('html-legend');
-  if(graphType === 'histogram'){ el.style.display = 'none'; return; }
+  if(!graphType || graphType === 'histogram'){ el.style.display = 'none'; return; }
 
   el.style.display = 'flex';
   el.innerHTML = '';
@@ -1099,6 +1053,7 @@ function canvasCoords(e){
 }
 
 dc.addEventListener('mousedown', e => {
+  if(!graphType) return;
   const { px, py } = canvasCoords(e);
   if(!inPlot(px, py)) return;
 
@@ -1130,6 +1085,7 @@ dc.addEventListener('mousedown', e => {
 });
 
 dc.addEventListener('mousemove', e => {
+  if(!graphType) return;
   const { px, py } = canvasCoords(e);
 
   if(errDrag !== null){
@@ -1172,6 +1128,7 @@ dc.addEventListener('mouseup', e => {
 dc.addEventListener('mouseleave', () => { dragging = false; errDrag = null; });
 
 dc.addEventListener('touchstart', e => {
+  if(!graphType) return;
   e.preventDefault();
   const t  = e.touches[0];
   const r  = dc.getBoundingClientRect();
@@ -1307,7 +1264,6 @@ function renderSerSelect(){
 
 function renderBarSerPicker(){
   const picker = document.getElementById('bar-ser-picker');
-  const label = picker.querySelector('.bsp-label');
   [...picker.querySelectorAll('.bsp-btn')].forEach(b => b.remove());
   series.forEach((s, i) => {
     const btn = document.createElement('button');
@@ -1374,6 +1330,11 @@ function setScaleDefaults(type){
 
 function setType(t){
   graphType = t;
+
+  // Unlock secondary toolbar & main config panel
+  document.getElementById('secondary-tools').classList.remove('controls-locked');
+  document.getElementById('main-config').classList.remove('controls-locked');
+
   ['bar','line','scatter','histogram'].forEach(g => {
     const btn = document.getElementById('btn-'+g);
     if(btn) btn.classList.toggle('active', g===t);
@@ -1573,6 +1534,7 @@ function compositeCanvas(){
 }
 
 async function downloadPNG(){
+  if(!graphType) return;
   const tmp = compositeCanvas();
   const now = new Date();
   const pad = n => String(n).padStart(2,'0');
@@ -1585,6 +1547,7 @@ async function downloadPNG(){
 }
 
 async function copyPNG(){
+  if(!graphType) return;
   const tmp = compositeCanvas();
   tmp.toBlob(async blob=>{
     try{
@@ -1601,8 +1564,6 @@ async function copyPNG(){
 // ════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════
-activeLabelInput = document.getElementById('inp-xlabel');
-setType('bar');
 renderSerSelect();
 renderLegList();
 
