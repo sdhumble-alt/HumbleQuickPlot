@@ -27,22 +27,32 @@ body {
   overflow: hidden;
 }
 
-/* ── TOP HEADER (full width) ── */
+/* ── TOP HEADER ── */
 #app-header {
   background: #1e2a3a;
   padding: 9px 16px 8px;
-  display: flex; align-items: center; gap: 16px;
+  display: flex; align-items: center; justify-content: space-between;
   flex-shrink: 0;
   border-bottom: 1px solid #12202e;
 }
+#app-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px; font-weight: bold;
+  color: #fff; letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+#app-subtitle {
+  font-size: 10px; color: rgba(255,255,255,0.58);
+  font-style: italic; white-space: nowrap;
+}
 
-/* ── MAIN BODY: left panel + right canvas ── */
+/* ── MAIN BODY ── */
 #app-body {
   display: flex;
   flex: 1;
   overflow: hidden;
   min-height: 0;
-  height: 0; /* force flex child to respect flex:1 */
+  height: 0;
 }
 
 /* ── LEFT CONTROL PANEL ── */
@@ -70,7 +80,7 @@ body {
   height: 100%;
 }
 
-/* ── GRAPH STACK (picker + legend + canvas, all same width) ── */
+/* ── GRAPH STACK ── */
 #graph-stack {
   display: flex;
   flex-direction: column;
@@ -84,17 +94,6 @@ body {
   background: #fff;
   flex-shrink: 0;
   box-shadow: 0 2px 12px rgba(30,42,58,0.10);
-}
-
-#app-title {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 15px; font-weight: bold;
-  color: #fff; letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-#app-subtitle {
-  font-size: 10px; color: rgba(255,255,255,0.58);
-  font-style: italic; white-space: nowrap;
 }
 
 /* ── TOOLBAR ── */
@@ -141,7 +140,7 @@ canvas { position: absolute; top: 0; left: 0; }
 #dc { cursor: crosshair; }
 #oc { pointer-events: none; }
 
-/* ── LOCKED CONTROLS WRAPPER ── */
+/* ── LOCKED CONTROLS ── */
 .controls-locked {
   opacity: 0.35;
   pointer-events: none;
@@ -172,16 +171,45 @@ canvas { position: absolute; top: 0; left: 0; }
   background: #fff; color: #1e2a3a;
 }
 .row input[type=text]:focus { outline: none; border-color: #1d5fc4; box-shadow: 0 0 0 2px rgba(29,95,196,0.15); }
+
+/* ── NUMBER INPUTS (CENTER JUSTIFIED & NO SPINNERS) ── */
 .row input[type=number] {
   width: 44px; font-size: 11px;
   padding: 3px 4px; border: 1px solid #c8d0dc; border-radius: 5px;
-  text-align: right; background: #fff; color: #1e2a3a;
+  text-align: center; background: #fff; color: #1e2a3a;
+  -moz-appearance: textfield;
+}
+.row input[type=number]::-webkit-outer-spin-button,
+.row input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 .row input[type=number]:focus { outline: none; border-color: #1d5fc4; }
+
 .row .mini-label {
   font-size: 10px; color: #6b7a90;
   white-space: nowrap; flex-shrink: 0;
 }
+
+/* ── SYMBOL BAR & FORMATTING BUTTONS ── */
+.symbol-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  margin-bottom: 6px; padding: 4px 6px;
+  background: #edf2f7; border-radius: 5px; border: 1px solid #e2e8f0;
+}
+.symbol-bar select {
+  flex: 1;
+  font-size: 11px; padding: 3px 6px; border: 1px solid #c8d0dc;
+  border-radius: 4px; background: #fff; cursor: pointer; color: #1e2a3a;
+}
+.fmt-btn {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 11px; font-weight: bold;
+  padding: 2px 7px; border: 1px solid #c8d0dc; background: #fff;
+  border-radius: 4px; cursor: pointer; color: #1e2a3a;
+  line-height: 1.2;
+}
+.fmt-btn:hover { background: #e2e8f0; }
 
 /* ── CATEGORY EDITOR ── */
 #cat-section { display: none; }
@@ -211,18 +239,119 @@ canvas { position: absolute; top: 0; left: 0; }
 }
 #cat-input-wrap button:hover { background: #edf0f5; }
 
-/* ── LEGEND EDITOR ── */
+/* ── CATEGORY RED HIGHLIGHT & ARROW ── */
+#cat-input-wrap input.needs-input {
+  border-color: #d55e00;
+  box-shadow: 0 0 0 2px rgba(213, 94, 0, 0.25);
+  animation: pulse-border-red 1.5s ease-in-out infinite;
+}
+@keyframes pulse-border-red {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(213, 94, 0, 0.25); }
+  50%       { box-shadow: 0 0 0 4px rgba(213, 94, 0, 0.5); }
+}
+
+#cat-arrow-hint {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  color: #d55e00;
+  font-size: 10.5px;
+  font-weight: 600;
+  margin-top: 5px;
+  padding: 1px 2px;
+  animation: bounce-arrow 0.8s ease-in-out infinite alternate;
+}
+@keyframes bounce-arrow {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-3px); }
+}
+
+/* ── LEGEND EDITOR & CUSTOM COLOR SELECTOR ── */
 .leg-hdr {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 5px;
 }
 .leg-hdr span { font-size: 11px; color: #4a5568; font-weight: 600; }
-#leg-list { display: flex; flex-direction: column; gap: 4px; max-height: 168px; overflow-y: auto; }
+#leg-list { display: flex; flex-direction: column; gap: 4px; }
 .leg-row { display: flex; align-items: center; gap: 5px; }
-.leg-row input[type=color] { width: 24px; height: 20px; border: 1px solid #c8d0dc; padding: 0; cursor: pointer; border-radius: 4px; }
 .leg-row input[type=text]  { flex:1; font-size:11px; padding:3px 5px; border:1px solid #c8d0dc; border-radius:5px; background:#fff; }
-.leg-row button { font-size:11px; padding:2px 6px; border:1px solid #e0a0aa; background:#fff; cursor:pointer; border-radius:5px; color:#b00020; }
-.leg-row button:hover { background: #fff0f2; }
+.leg-row button.del-btn { font-size:11px; padding:2px 6px; border:1px solid #e0a0aa; background:#fff; cursor:pointer; border-radius:5px; color:#b00020; }
+.leg-row button.del-btn:hover { background: #fff0f2; }
+
+/* ── COLOR DROPDOWN COMPONENT ── */
+.color-picker-custom {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.color-trigger {
+  width: 32px;
+  height: 22px;
+  border: 1px solid #c8d0dc;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 3px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+}
+.color-trigger .arrow {
+  width: 0; height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid rgba(0,0,0,0.6);
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.8));
+}
+.color-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid #c8d0dc;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 6px;
+  width: 122px;
+}
+.color-menu.open { display: block; }
+.color-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  margin-bottom: 6px;
+}
+.color-palette-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,0.15);
+  transition: transform 0.05s;
+}
+.color-palette-swatch:hover {
+  transform: scale(1.15);
+  border-color: #1e2a3a;
+}
+.custom-hex-btn {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 10px;
+  font-weight: 500;
+  border: 1px solid #c8d0dc;
+  border-radius: 4px;
+  background: #f4f6f9;
+  cursor: pointer;
+  text-align: center;
+  color: #1e2a3a;
+  display: block;
+}
+.custom-hex-btn:hover {
+  background: #e5e9f0;
+}
 
 /* ── BAR SERIES PICKER ── */
 #bar-ser-picker {
@@ -263,28 +392,11 @@ canvas { position: absolute; top: 0; left: 0; }
 .bsp-btn:not(.bsp-active) { opacity: 0.5; }
 .bsp-btn:hover:not(.bsp-active) { opacity: 0.8; }
 
-/* ── CATEGORY PROMPT ── */
-#cat-input-wrap input.needs-input {
-  border-color: #1d5fc4;
-  box-shadow: 0 0 0 2px rgba(29,95,196,0.2);
-  animation: pulse-border 1.5s ease-in-out infinite;
-}
-@keyframes pulse-border {
-  0%,100% { box-shadow: 0 0 0 2px rgba(29,95,196,0.2); }
-  50%      { box-shadow: 0 0 0 4px rgba(29,95,196,0.38); }
-}
-#cat-hint {
-  font-size: 10px; color: #1d5fc4;
-  margin-top: 4px; display: none; padding: 0 2px;
-}
-
-/* ── EXPORT ROW ── */
+/* ── EXPORT ROW (CENTERED) ── */
 #export-row {
   border-top: 1px solid #e4e8ef; background: #f4f6f9;
-  padding: 7px 12px; display: flex; gap: 7px; align-items: center;
-}
-#export-row span {
-  font-size: 11px; color: #6b7a90; flex: 1;
+  padding: 7px 12px; display: flex; flex-wrap: wrap; gap: 8px;
+  align-items: center; justify-content: center;
 }
 
 /* ── STATUS + VERSION ROW ── */
@@ -302,9 +414,6 @@ canvas { position: absolute; top: 0; left: 0; }
   white-space: nowrap; padding: 3px 8px;
   border-left: 1px solid #e4e8ef;
 }
-
-/* histogram cursor */
-#dc.hist-hover { cursor: ns-resize; }
 
 /* ── HTML LEGEND STRIP ── */
 #html-legend {
@@ -330,36 +439,38 @@ canvas { position: absolute; top: 0; left: 0; }
   width: 16px; height: 12px; border-radius: 3px; flex-shrink: 0;
   border: 1px solid rgba(0,0,0,0.12);
 }
-.hl-marker {
-  width: 16px; height: 16px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-}
 
-/* old standalone statusbar rule kept for JS target */
 #statusbar { border: none; background: transparent; }
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- ══ HEADER (full width top bar) ══ -->
+<input type="color" id="hidden-custom-color" style="position:fixed; top:-100px; left:-100px; opacity:0; pointer-events:none;">
+<input type="file" id="file-loader" accept=".json" style="display:none;" onchange="handleFileLoad(event)">
+
+<!-- ══ HEADER ══ -->
 <div id="app-header">
   <div>
     <div id="app-title">A Humble Quick Plot</div>
     <div id="app-subtitle">A Quick Graph Builder for Students — Created by Steven Humble</div>
   </div>
+  <div style="display:flex; gap:6px;">
+    <button class="tb" onclick="saveProject()" title="Save project to .json file">💾 Save</button>
+    <button class="tb" onclick="document.getElementById('file-loader').click()" title="Open existing .json project">📂 Open</button>
+  </div>
 </div>
 
-<!-- ══ APP BODY: left controls + right canvas ══ -->
+<!-- ══ APP BODY ══ -->
 <div id="app-body">
 
-  <!-- LEFT PANEL: toolbar + all controls -->
+  <!-- LEFT PANEL -->
   <div id="left-panel">
 
   <!-- ══ TOOLBAR ══ -->
   <div id="toolbar">
 
-    <!-- Row 1: Graph type buttons (always accessible) -->
+    <!-- Row 1: Graph type buttons -->
     <div class="tb-row">
       <div class="tg">
         <span class="tg-label">Type:</span>
@@ -370,17 +481,18 @@ canvas { position: absolute; top: 0; left: 0; }
       </div>
     </div>
 
-    <!-- Secondary tools (locked until type selected) -->
+    <!-- Secondary tools -->
     <div id="secondary-tools" class="controls-locked">
-      <!-- Row 2: Tools (Best Fit & Error) -->
+      <!-- Row 2: Best Fit, Error, Minor Grid -->
       <div class="tb-row" style="justify-content: center; margin-top: 5px;">
         <div class="tg">
-          <button class="tb" id="btn-bf" onclick="toggleBestFit()" title="Toggle best-fit line (scatter)">Best Fit</button>
+          <button class="tb" id="btn-bf" onclick="toggleBestFit()" title="Toggle best-fit line & regression (scatter)">Best Fit (y=mx+b)</button>
           <button class="tb" id="btn-eb" onclick="toggleErrorBars()" title="Toggle error bar entry mode">± Error</button>
+          <button class="tb" id="btn-mg" onclick="toggleMinorGrid()" title="Toggle minor gridlines">Minor Grid</button>
         </div>
       </div>
 
-      <!-- Row 3: + Series + Undo + Delete + Clear -->
+      <!-- Row 3: + Series, Undo, Delete, Clear -->
       <div class="tb-row" style="justify-content: center; margin-top: 5px;">
         <div class="tg" id="tg-addseries">
           <button class="tb" onclick="addSeries()">+ Series</button>
@@ -388,21 +500,45 @@ canvas { position: absolute; top: 0; left: 0; }
         <div class="tg" style="border-left:none; padding-left:3px; margin-left:0;">
           <button class="tb" onclick="undoLast()">↩ Undo</button>
           <button class="tb" id="btn-delete" onclick="toggleDeleteMode()" title="Toggle delete mode">🗑</button>
-          <button class="tb red" onclick="clearAll()">✕ Clear All</button>
+          <button class="tb red" onclick="clearAll()">✕ Clear</button>
         </div>
+      </div>
+
+      <!-- Row 4: Graph Title -->
+      <div class="row" style="margin-top: 6px; margin-bottom: 2px;">
+        <label style="width: 70px;">Graph Title:</label>
+        <input type="text" id="inp-title" oninput="redraw()">
       </div>
     </div>
 
   </div><!-- #toolbar -->
 
-    <!-- ══ MAIN CONFIG WRAPPER (locked until type selected) ══ -->
+    <!-- ══ MAIN CONFIG WRAPPER ══ -->
     <div id="main-config" class="controls-locked">
 
-      <!-- ══ AXIS LABELS + SCALE ══ -->
+      <!-- ══ SYMBOLS & AXIS LABELS ══ -->
       <div class="section">
+        
+        <!-- Symbol & Super/Subscript Action Bar -->
+        <div class="symbol-bar">
+          <select onchange="insertSymbol(this.value); this.selectedIndex=0;" title="Insert symbol at cursor">
+            <option value="" disabled selected>Symbols…</option>
+            <option value="±">± (Plus-Minus)</option>
+            <option value="°">° (Degree)</option>
+            <option value="μ">μ (Micro)</option>
+            <option value="Δ">Δ (Delta)</option>
+            <option value="Ψ">Ψ (Psi)</option>
+            <option value="α">α (Alpha)</option>
+            <option value="β">β (Beta)</option>
+            <option value="Φ">Φ (Phi)</option>
+          </select>
+          <button type="button" class="fmt-btn" onmousedown="event.preventDefault(); applyFormatting('super');" title="Convert highlighted text to Superscript">X²</button>
+          <button type="button" class="fmt-btn" onmousedown="event.preventDefault(); applyFormatting('sub');" title="Convert highlighted text to Subscript">X₂</button>
+        </div>
+
         <div class="row">
           <label>X-Axis Label:</label>
-          <input type="text" id="inp-xlabel" placeholder="" oninput="onXLabelChange()">
+          <input type="text" id="inp-xlabel" oninput="onXLabelChange()">
         </div>
         <div class="row" id="xscale-row" style="display:none; flex-wrap:nowrap; justify-content:center;">
           <span class="mini-label" id="xscale-lbl">Min:</span>
@@ -415,7 +551,7 @@ canvas { position: absolute; top: 0; left: 0; }
         <hr style="border:none; border-top:1px dotted #c8d0dc; margin:5px 0;">
         <div class="row">
           <label>Y-Axis Label:</label>
-          <input type="text" id="inp-ylabel" placeholder="" oninput="redraw()">
+          <input type="text" id="inp-ylabel" oninput="redraw()">
         </div>
         <div class="row" style="flex-wrap:nowrap; justify-content:center;">
           <span class="mini-label">Min:</span>
@@ -427,11 +563,33 @@ canvas { position: absolute; top: 0; left: 0; }
         </div>
       </div>
 
-      <!-- ══ LEGEND EDITOR ══ -->
+      <!-- ══ CATEGORY EDITOR ══ -->
+      <div class="section" id="cat-section">
+        <div class="row" style="margin-bottom:0">
+          <label>X Categories:</label>
+          <span style="font-size:10px;color:#999;">Add a label for each bar</span>
+        </div>
+        <div id="cat-list"></div>
+        <div id="cat-input-wrap">
+          <input type="text" id="cat-input"
+            oninput="hideCategoryArrow()"
+            onkeydown="if(event.key==='Enter')addCategory()">
+          <button onclick="addCategory()">+ Add</button>
+        </div>
+        <div id="cat-arrow-hint">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d55e00" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+          </svg>
+          <span>Add category name here first</span>
+        </div>
+      </div>
+
+      <!-- ══ LEGEND / GROUPS EDITOR ══ -->
       <div class="section" id="leg-section">
         <div id="leg-normal">
           <div class="leg-hdr">
-            <span>Legend / Series</span>
+            <span id="leg-title">Legend / Series</span>
             <button class="tb" onclick="addSeries()">+ Add Series</button>
           </div>
           <div id="leg-list"></div>
@@ -439,30 +597,9 @@ canvas { position: absolute; top: 0; left: 0; }
         <div id="leg-hist" style="display:none">
           <div class="row">
             <label>Bar Color:</label>
-            <input type="color" value="#1a56b8" id="hist-color"
-              onchange="series[0].color=this.value; redraw()">
+            <div id="hist-color-wrap"></div>
           </div>
         </div>
-      </div>
-
-      <!-- ══ CATEGORY EDITOR (bar only) ══ -->
-      <div class="section" id="cat-section">
-        <div class="row">
-          <label>Bar Style:</label>
-          <span class="mini-label">Groups:</span>
-          <input type="number" id="inp-groups" value="1" min="1" max="6" step="1"
-            style="width:42px" oninput="onGroupsChange()">
-        </div>
-        <div class="row" style="margin-bottom:0">
-          <label>X Categories:</label>
-          <span style="font-size:10px;color:#999;">Add a label for each bar</span>
-        </div>
-        <div id="cat-list"></div>
-        <div id="cat-input-wrap">
-          <input type="text" id="cat-input" placeholder="Type a category name…" onkeydown="if(event.key==='Enter')addCategory()">
-          <button onclick="addCategory()">+ Add</button>
-        </div>
-        <div id="cat-hint">↑ Type a category name and click + Add to build your graph</div>
       </div>
 
       <!-- ══ HISTOGRAM CONFIG ══ -->
@@ -475,15 +612,14 @@ canvas { position: absolute; top: 0; left: 0; }
           <span class="mini-label"># Bins:</span>
           <input type="number" id="inp-bincount" value="5" min="1" max="20" oninput="redraw()" style="width:50px">
         </div>
-        <div id="hist-hint" style="font-size:10px;color:#1d5fc4;margin-top:3px;display:none">
+        <div id="hist-hint" style="font-size:10px;color:#d55e00;margin-top:3px;display:none">
           Set bin parameters above, then click each bin to enter its frequency
         </div>
       </div>
 
       <!-- ══ EXPORT ══ -->
       <div id="export-row">
-        <span>Export:</span>
-        <button class="tb" onclick="downloadPNG()">⬇ Download PNG</button>
+        <button class="tb" onclick="downloadPNG()">⬇ PNG</button>
         <button class="tb green" onclick="copyPNG()" id="btn-copy">📋 Copy Image</button>
       </div>
 
@@ -492,7 +628,7 @@ canvas { position: absolute; top: 0; left: 0; }
     <!-- ══ STATUS + VERSION ══ -->
     <div id="statusbar-row">
       <div id="statusbar"></div>
-      <div id="app-version">v1.5.1 &nbsp;·&nbsp; 08-19-2026</div>
+      <div id="app-version">v1.6.0 &nbsp;·&nbsp; 08-20-2026</div>
     </div>
 
   </div><!-- #left-panel -->
@@ -500,31 +636,134 @@ canvas { position: absolute; top: 0; left: 0; }
   <!-- RIGHT: series picker + legend + graph canvas -->
   <div id="right-canvas">
     <div id="graph-stack">
-      <!-- series picker (shows above graph when >1 series) -->
       <div id="bar-ser-picker">
         <span class="bsp-label">Drawing on:</span>
       </div>
-      <!-- html legend strip -->
       <div id="html-legend"></div>
-      <!-- the graph itself -->
       <div id="graph-wrap">
         <canvas id="gc"></canvas>
         <canvas id="dc"></canvas>
         <canvas id="oc"></canvas>
       </div>
     </div>
-  </div><!-- #right-canvas -->
+  </div>
 
-</div><!-- #app-body -->
+</div>
 
-</div><!-- #app -->
+</div>
 
 <script>
 // ════════════════════════════════════════════════
-//  CONSTANTS & STATE
+//  CONSTANTS & STATE (Okabe-Ito Palette)
 // ════════════════════════════════════════════════
 let W = 800, H = 600;
-const M = { top: 36, right: 30, bottom: 62, left: 62 };
+const M = { top: 40, right: 30, bottom: 64, left: 64 };
+
+const PRESET_COLORS = [
+  { name: 'Navy / Blue',     value: '#0072B2' },
+  { name: 'Orange',          value: '#E69F00' },
+  { name: 'Bluish Green',    value: '#009E73' },
+  { name: 'Vermilion',       value: '#D55E00' },
+  { name: 'Sky Blue',        value: '#56B4E9' },
+  { name: 'Reddish Purple',  value: '#CC79A7' },
+  { name: 'Darkened Gold',   value: '#E5C494' },
+  { name: 'Charcoal Slate',  value: '#4A5568' }
+];
+
+const COLORS = PRESET_COLORS.map(c => c.value);
+const SHAPES = ['circle','square','triangle','diamond','cross','star'];
+
+let graphType      = null;
+let activeSer      = 0;
+let showBestFit    = false;
+let showMinorGrid  = false;
+let errorMode      = false;
+let deleteMode     = false;
+let categories     = [];
+
+let series = [
+  { label:'Series 1', color: COLORS[0], points:[], errors:[] }
+];
+
+// ════════════════════════════════════════════════
+//  UNICODE MAPS & SELECTION FORMATTING
+// ════════════════════════════════════════════════
+const SUPER_MAP = {
+  '0':'⁰', '1':'¹', '2':'²', '3':'³', '4':'⁴', '5':'⁵', '6':'⁶', '7':'⁷', '8':'⁸', '9':'⁹',
+  '+':'⁺', '-':'⁻', '=':'⁼', '(':'⁽', ')':'⁾', 'a':'ᵃ', 'b':'ᵇ', 'c':'ᶜ', 'd':'ᵈ', 'e':'ᵉ',
+  'f':'ᶠ', 'g':'ᵍ', 'h':'ʰ', 'i':'ⁱ', 'j':'ʲ', 'k':'ᵏ', 'l':'ˡ', 'm':'ᵐ', 'n':'ⁿ', 'o':'ᵒ',
+  'p':'ᵖ', 'r':'ʳ', 's':'ˢ', 't':'ᵗ', 'u':'ᵘ', 'v':'ᵛ', 'w':'ʷ', 'x':'ˣ', 'y':'ʸ', 'z':'ᶻ'
+};
+
+const SUB_MAP = {
+  '0':'₀', '1':'₁', '2':'₂', '3':'₃', '4':'₄', '5':'₅', '6':'₆', '7':'₇', '8':'₈', '9':'₉',
+  '+':'₊', '-':'₋', '=':'₌', '(':'₍', ')':'₎', 'a':'ₐ', 'e':'ₑ', 'h':'ₕ', 'i':'ᵢ', 'j':'ⱼ',
+  'k':'ₖ', 'l':'ₗ', 'm':'ₘ', 'n':'ₙ', 'o':'ₒ', 'p':'ₚ', 'r':'ᵣ', 's':'ₛ', 't':'ₜ', 'u':'ᵤ',
+  'v':'ᵥ', 'x':'ₓ'
+};
+
+// Inverse maps to toggle back if already formatted
+const INV_SUPER = Object.fromEntries(Object.entries(SUPER_MAP).map(([k, v]) => [v, k]));
+const INV_SUB   = Object.fromEntries(Object.entries(SUB_MAP).map(([k, v]) => [v, k]));
+
+let lastFocusedInput = document.getElementById('inp-xlabel');
+document.addEventListener('focusin', (e) => {
+  if(!e.target) return;
+  if((e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') && e.target.type === 'text'){
+    lastFocusedInput = e.target;
+  }
+  if(e.target.type === 'number'){
+    setTimeout(() => e.target.select(), 0);
+  }
+});
+
+function insertSymbol(sym){
+  if(!lastFocusedInput) lastFocusedInput = document.getElementById('inp-xlabel');
+  const el = lastFocusedInput;
+  const start = el.selectionStart || 0;
+  const end   = el.selectionEnd || 0;
+  const val   = el.value;
+  el.value = val.substring(0, start) + sym + val.substring(end);
+  el.focus();
+  el.selectionStart = el.selectionEnd = start + sym.length;
+  el.dispatchEvent(new Event('input'));
+}
+
+function applyFormatting(type){
+  if(!lastFocusedInput) lastFocusedInput = document.getElementById('inp-xlabel');
+  const el = lastFocusedInput;
+  const start = el.selectionStart || 0;
+  const end   = el.selectionEnd || 0;
+  if(start === end) return;
+
+  const selectedText = el.value.substring(start, end);
+  const map = (type === 'super') ? SUPER_MAP : SUB_MAP;
+  const inv = (type === 'super') ? INV_SUPER : INV_SUB;
+
+  let transformed = '';
+  for(let char of selectedText){
+    const lower = char.toLowerCase();
+    if(inv[char]){
+      transformed += inv[char];
+    } else if(map[lower]){
+      transformed += map[lower];
+    } else {
+      transformed += char;
+    }
+  }
+
+  const val = el.value;
+  el.value = val.substring(0, start) + transformed + val.substring(end);
+  el.focus();
+  el.selectionStart = start;
+  el.selectionEnd = start + transformed.length;
+  el.dispatchEvent(new Event('input'));
+}
+
+// canvases
+const gc = document.getElementById('gc'), gctx = gc.getContext('2d');
+const dc = document.getElementById('dc'), dctx = dc.getContext('2d');
+const oc = document.getElementById('oc'), octx = oc.getContext('2d');
 
 function resizeCanvases(){
   const header  = document.getElementById('app-header');
@@ -558,24 +797,6 @@ function resizeCanvases(){
     c.style.height = size + 'px';
   });
 }
-const COLORS = ['#1a56b8','#c0392b','#27ae60','#8e44ad','#e67e22','#16a085'];
-const SHAPES  = ['circle','square','triangle','diamond','cross','star'];
-
-let graphType   = null;
-let activeSer   = 0;
-let showBestFit = false;
-let errorMode   = false;
-let deleteMode  = false;
-let categories  = [];
-
-let series = [
-  { label:'Series 1', color: COLORS[0], points:[], errors:[] }
-];
-
-// canvases
-const gc = document.getElementById('gc'), gctx = gc.getContext('2d');
-const dc = document.getElementById('dc'), dctx = dc.getContext('2d');
-const oc = document.getElementById('oc'), octx = oc.getContext('2d');
 
 // ════════════════════════════════════════════════
 //  SCALE HELPERS
@@ -596,11 +817,8 @@ function inPlot(px,py){
   return px>=M.left && px<=M.left+pW() && py>=M.top && py<=M.top+pH();
 }
 
-function status(msg){ /* intentionally blank for now */ }
+function status(msg){ /* intentional */ }
 
-// ════════════════════════════════════════════════
-//  NICE TICK STEPS
-// ════════════════════════════════════════════════
 function xStep(){
   const v = parseFloat(document.getElementById('inp-xstep').value);
   return (v > 0) ? v : null;
@@ -609,23 +827,41 @@ function yStep(){
   const v = parseFloat(document.getElementById('inp-ystep').value);
   return (v > 0) ? v : null;
 }
+
+function getEffectiveStep(mn, mx, manualStep){
+  const range = mx - mn; if(range <= 0) return null;
+  if(manualStep && manualStep > 0) return manualStep;
+  const rough = range / 6;
+  const mag   = Math.pow(10, Math.floor(Math.log10(rough)));
+  const r     = rough / mag;
+  return r < 1.5 ? mag : r < 3.5 ? 2*mag : r < 7.5 ? 5*mag : 10*mag;
+}
+
 function niceSteps(mn, mx, manualStep){
-  const range = mx - mn; if(range <= 0) return [];
-  let step;
-  if(manualStep && manualStep > 0){
-    step = manualStep;
-  } else {
-    const rough = range / 6;
-    const mag   = Math.pow(10, Math.floor(Math.log10(rough)));
-    const r     = rough / mag;
-    step = r < 1.5 ? mag : r < 3.5 ? 2*mag : r < 7.5 ? 5*mag : 10*mag;
-  }
+  const step = getEffectiveStep(mn, mx, manualStep);
+  if(!step) return [];
   const steps = [];
   const start = Math.ceil(mn / step) * step;
   for(let v = start; v <= mx + 1e-9; v += step)
     steps.push(parseFloat(v.toPrecision(10)));
   return steps;
 }
+
+function minorSteps(mn, mx, majorStep){
+  if(!majorStep || majorStep <= 0) return [];
+  const sub = 4;
+  const mStep = majorStep / sub;
+  const steps = [];
+  const start = Math.ceil(mn / mStep) * mStep;
+  for(let v = start; v <= mx + 1e-9; v += mStep){
+    const isMajor = Math.abs(v - Math.round(v / majorStep) * majorStep) < (mStep * 0.2);
+    if(!isMajor){
+      steps.push(parseFloat(v.toPrecision(10)));
+    }
+  }
+  return steps;
+}
+
 function fmt(v){ return Number.isInteger(v)?String(v):parseFloat(v.toPrecision(4)).toString(); }
 function darken(hex){
   const n=parseInt(hex.replace('#',''),16);
@@ -633,7 +869,7 @@ function darken(hex){
 }
 
 // ════════════════════════════════════════════════
-//  DRAW GRID
+//  DRAW GRID & LABELS
 // ════════════════════════════════════════════════
 function syncHistXScale(){
   if(graphType !== 'histogram') return;
@@ -648,11 +884,10 @@ function drawGrid(){
   gctx.clearRect(0,0,W,H);
   gctx.fillStyle='#fff'; gctx.fillRect(0,0,W,H);
 
-  const fs  = Math.max(9, Math.round(W / 80));
-  const fsl = Math.max(10, Math.round(W / 65));
-  const fsp = Math.max(11, Math.round(W / 60));
+  const fs   = Math.max(9, Math.round(W / 80));
+  const fsl  = Math.max(13, Math.round(W / 50));
+  const fsp  = Math.max(11, Math.round(W / 60));
 
-  // plot box
   gctx.strokeStyle='#111'; gctx.lineWidth=0.6;
   gctx.strokeRect(M.left,M.top,pW(),pH());
 
@@ -671,6 +906,34 @@ function drawGrid(){
 
   syncHistXScale();
 
+  // ── MINOR GRIDLINES (1/4, 1/2, 3/4) ──
+  if(showMinorGrid){
+    gctx.strokeStyle = '#ebeef5';
+    gctx.lineWidth   = 0.5;
+
+    // Minor Y
+    const yEff = getEffectiveStep(yMin(), yMax(), yStep());
+    if(yEff){
+      minorSteps(yMin(), yMax(), yEff).forEach(v => {
+        const y = dy(v);
+        if(y < M.top || y > M.top + pH()) return;
+        gctx.beginPath(); gctx.moveTo(M.left, y); gctx.lineTo(M.left + pW(), y); gctx.stroke();
+      });
+    }
+
+    // Minor X (Line & Scatter)
+    if(graphType !== 'bar' && graphType !== 'histogram'){
+      const xEff = getEffectiveStep(xMin(), xMax(), xStep());
+      if(xEff){
+        minorSteps(xMin(), xMax(), xEff).forEach(v => {
+          const x = dx(v);
+          if(x < M.left || x > M.left + pW()) return;
+          gctx.beginPath(); gctx.moveTo(x, M.top); gctx.lineTo(x, M.top + pH()); gctx.stroke();
+        });
+      }
+    }
+  }
+
   const drawXTick = (v,label) => {
     const x = dx(v);
     if(x<M.left-1||x>M.left+pW()+1) return;
@@ -678,7 +941,7 @@ function drawGrid(){
     gctx.beginPath(); gctx.moveTo(x,M.top); gctx.lineTo(x,M.top+pH()); gctx.stroke();
     gctx.strokeStyle='#444'; gctx.lineWidth=1;
     gctx.beginPath(); gctx.moveTo(x,M.top+pH()); gctx.lineTo(x,M.top+pH()+5); gctx.stroke();
-    gctx.fillStyle='#222'; gctx.font=`${fs}px Arial`; gctx.textAlign='center';
+    gctx.fillStyle='#222'; gctx.font=`${fs}px 'Arial Narrow', Arial, sans-serif`; gctx.textAlign='center';
     gctx.fillText(label, x, M.top+pH()+fs+4);
   };
   const drawYTick = (v,label) => {
@@ -688,7 +951,7 @@ function drawGrid(){
     gctx.beginPath(); gctx.moveTo(M.left,y); gctx.lineTo(M.left+pW(),y); gctx.stroke();
     gctx.strokeStyle='#444'; gctx.lineWidth=1;
     gctx.beginPath(); gctx.moveTo(M.left,y); gctx.lineTo(M.left-5,y); gctx.stroke();
-    gctx.fillStyle='#222'; gctx.font=`${fs}px Arial`; gctx.textAlign='right';
+    gctx.fillStyle='#222'; gctx.font=`${fs}px 'Arial Narrow', Arial, sans-serif`; gctx.textAlign='right';
     gctx.fillText(label, M.left-7, y+fs/3);
   };
 
@@ -702,12 +965,11 @@ function drawGrid(){
       const cx = M.left + pW()/2;
       const cy = M.top  + pH()/2;
       gctx.save();
-      gctx.globalAlpha = 0.55;
-      gctx.fillStyle   = '#1d5fc4';
-      gctx.font        = `bold ${fsp}px Arial`;
+      gctx.fillStyle   = '#d55e00';
+      gctx.font        = `bold ${fsp}px 'Arial Narrow', Arial, sans-serif`;
       gctx.textAlign   = 'center';
       gctx.fillText('Add an X Category to Start', cx, cy - Math.round(fsp*0.8));
-      gctx.font        = `${Math.round(fsp*0.85)}px Arial`;
+      gctx.font        = `${Math.round(fsp*0.85)}px 'Arial Narrow', Arial, sans-serif`;
       gctx.fillText('Type a name → click  + Add', cx, cy + Math.round(fsp*0.9));
       gctx.restore();
       updateCatHint(true);
@@ -760,15 +1022,31 @@ function drawGrid(){
     gctx.stroke();
   }
 
-  // axis labels
-  const xl = document.getElementById('inp-xlabel').value||'';
-  const yl = document.getElementById('inp-ylabel').value||'';
+  // Titles & Axis Labels
+  const title = document.getElementById('inp-title').value || '';
+  const xl    = document.getElementById('inp-xlabel').value || '';
+  const yl    = document.getElementById('inp-ylabel').value || '';
 
   gctx.fillStyle='#111';
-  if(xl){ gctx.font=`bold ${fsl}px Times New Roman`; gctx.textAlign='center'; gctx.fillText(xl,M.left+pW()/2,H-6); }
+  if(title){
+    gctx.font = `bold ${fsl + 2}px 'Arial Narrow', Arial, sans-serif`;
+    gctx.textAlign = 'center';
+    gctx.fillText(title, M.left + pW()/2, M.top - 14);
+  }
+
+  if(xl){
+    gctx.font = `bold ${fsl}px 'Arial Narrow', Arial, sans-serif`;
+    gctx.textAlign = 'center';
+    gctx.fillText(xl, M.left + pW()/2, H - 9);
+  }
+
   if(yl){
-    gctx.save(); gctx.translate(Math.round(fsl*1.1),M.top+pH()/2); gctx.rotate(-Math.PI/2);
-    gctx.font=`bold ${fsl}px Times New Roman`; gctx.textAlign='center'; gctx.fillText(yl,0,0);
+    gctx.save();
+    gctx.translate(Math.round(fsl * 1.05), M.top + pH()/2);
+    gctx.rotate(-Math.PI/2);
+    gctx.font = `bold ${fsl}px 'Arial Narrow', Arial, sans-serif`;
+    gctx.textAlign = 'center';
+    gctx.fillText(yl, 0, 0);
     gctx.restore();
   }
 }
@@ -793,7 +1071,7 @@ function barGeom(catIdx, serIdx){
 }
 
 // ════════════════════════════════════════════════
-//  DRAW DATA
+//  DRAW DATA & REGRESSION
 // ════════════════════════════════════════════════
 function drawData(){
   dctx.clearRect(0,0,W,H);
@@ -804,8 +1082,8 @@ function drawData(){
   dctx.rect(M.left,M.top,pW(),pH());
   dctx.clip();
 
-  if(graphType==='bar')           drawBars();
-  else if(graphType==='line')     drawLines();
+  if(graphType==='bar')            drawBars();
+  else if(graphType==='line')      drawLines();
   else if(graphType==='histogram') drawHistogram();
   else                             drawScatter();
 
@@ -813,7 +1091,35 @@ function drawData(){
 }
 
 function drawBars(){
-  drawBarsGrouped();
+  const baselineData = Math.max(yMin(), Math.min(yMax(), 0));
+  series.forEach((s,si)=>{
+    categories.forEach((cat,ci)=>{
+      const pt = s.points.find(p=>p.cat===ci);
+      if(!pt) return;
+      const {bx,bw} = barGeom(ci,si);
+      const by = dy(baselineData);
+      const ty = dy(pt.y);
+      const bh = by - ty;
+      if(bh === 0) return;
+      dctx.fillStyle   = s.color+'cc';
+      dctx.strokeStyle = darken(s.color);
+      dctx.lineWidth   = 1;
+      dctx.fillRect(bx,   Math.min(by,ty), bw, Math.abs(bh));
+      dctx.strokeRect(bx, Math.min(by,ty), bw, Math.abs(bh));
+      if(pt.err && pt.err>0){
+        const ex = bx+bw/2;
+        const ey1 = dy(pt.y+pt.err);
+        const ey2 = dy(pt.y-pt.err);
+        const capW = bw*0.3;
+        dctx.strokeStyle='#000'; dctx.lineWidth=1.5;
+        dctx.beginPath();
+        dctx.moveTo(ex,ey1); dctx.lineTo(ex,ey2);
+        dctx.moveTo(ex-capW,ey1); dctx.lineTo(ex+capW,ey1);
+        dctx.moveTo(ex-capW,ey2); dctx.lineTo(ex+capW,ey2);
+        dctx.stroke();
+      }
+    });
+  });
 }
 
 function histBinStart()  { return parseFloat(document.getElementById('inp-binstart').value)  || 0; }
@@ -867,38 +1173,6 @@ function drawHistogram(){
   });
 }
 
-function drawBarsGrouped(){
-  const baselineData = Math.max(yMin(), Math.min(yMax(), 0));
-  series.forEach((s,si)=>{
-    categories.forEach((cat,ci)=>{
-      const pt = s.points.find(p=>p.cat===ci);
-      if(!pt) return;
-      const {bx,bw} = barGeom(ci,si);
-      const by = dy(baselineData);
-      const ty = dy(pt.y);
-      const bh = by - ty;
-      if(bh === 0) return;
-      dctx.fillStyle   = s.color+'cc';
-      dctx.strokeStyle = darken(s.color);
-      dctx.lineWidth   = 1;
-      dctx.fillRect(bx,   Math.min(by,ty), bw, Math.abs(bh));
-      dctx.strokeRect(bx, Math.min(by,ty), bw, Math.abs(bh));
-      if(pt.err && pt.err>0){
-        const ex = bx+bw/2;
-        const ey1 = dy(pt.y+pt.err);
-        const ey2 = dy(pt.y-pt.err);
-        const capW = bw*0.3;
-        dctx.strokeStyle='#000'; dctx.lineWidth=1.5;
-        dctx.beginPath();
-        dctx.moveTo(ex,ey1); dctx.lineTo(ex,ey2);
-        dctx.moveTo(ex-capW,ey1); dctx.lineTo(ex+capW,ey1);
-        dctx.moveTo(ex-capW,ey2); dctx.lineTo(ex+capW,ey2);
-        dctx.stroke();
-      }
-    });
-  });
-}
-
 function drawLines(){
   series.forEach(s=>{
     if(!s.points.length) return;
@@ -944,7 +1218,7 @@ function drawScatter(){
       drawMarker(dctx,x,y,SHAPES[si%SHAPES.length],s.color);
     });
     if(showBestFit && s.points.length>=2){
-      drawBestFit(dctx, s.points, s.color);
+      drawBestFit(dctx, s.points, s.color, si);
     }
   });
 }
@@ -973,7 +1247,7 @@ function drawMarker(ctx,x,y,shape,color){
   ctx.fill(); ctx.stroke();
 }
 
-function drawBestFit(ctx, pts, color, dxFn, dyFn, xMinFn, xMaxFn){
+function drawBestFit(ctx, pts, color, serIdx = 0, dxFn, dyFn, xMinFn, xMaxFn){
   dxFn   = dxFn   || dx;   dyFn   = dyFn   || dy;
   xMinFn = xMinFn || xMin; xMaxFn = xMaxFn || xMax;
   const n = pts.length;
@@ -1001,16 +1275,23 @@ function drawBestFit(ctx, pts, color, dxFn, dyFn, xMinFn, xMaxFn){
   const ss_res = pts2.reduce((s,v)=>s+v*v,0);
   const ss_tot = pts.reduce((s,p)=>s+(p.y-my)**2,0);
   const r2 = ss_tot>0 ? 1-ss_res/ss_tot : 1;
-  ctx.fillStyle=color; ctx.font='italic 10px Arial'; ctx.textAlign='left';
-  ctx.fillText(`R² = ${r2.toFixed(3)}`, M.left+pW()-55, M.top+14);
+
+  const sign = intercept >= 0 ? '+' : '-';
+  const eqStr = `y = ${slope.toFixed(2)}x ${sign} ${Math.abs(intercept).toFixed(2)}`;
+  const r2Str = `R² = ${r2.toFixed(3)}`;
+
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.font = "bold 10px 'Arial Narrow', monospace";
+  ctx.textAlign = 'right';
+  const baseY = M.top + 14 + (serIdx * 24);
+  ctx.fillText(eqStr, M.left + pW() - 8, baseY);
+  ctx.font = "italic 9.5px 'Arial Narrow', Arial, sans-serif";
+  ctx.fillText(r2Str, M.left + pW() - 8, baseY + 11);
+  ctx.restore();
 }
 
-// ════════════════════════════════════════════════
-//  HTML LEGEND (outside graph canvas)
-// ════════════════════════════════════════════════
-function drawOverlay(){
-  octx.clearRect(0,0,W,H);
-}
+function drawOverlay(){ octx.clearRect(0,0,W,H); }
 
 function renderHtmlLegend(){
   const el = document.getElementById('html-legend');
@@ -1073,9 +1354,6 @@ dc.addEventListener('mousedown', e => {
     });
     if(nearest !== -1 && bestD <= 40){
       errDrag = { ptIdx: nearest, anchorDataY: s.points[nearest].y };
-      status('Drag up or down to set the ± error bar size.');
-    } else {
-      status('Click closer to a data point to drag its error bar.');
     }
     return;
   }
@@ -1093,21 +1371,15 @@ dc.addEventListener('mousemove', e => {
     const errVal    = Math.abs(draggedY - errDrag.anchorDataY);
     series[activeSer].points[errDrag.ptIdx].err = parseFloat(errVal.toFixed(3));
     redraw();
-    status('Drag to adjust — release to confirm.');
     return;
   }
 
   if(inPlot(px, py)){
     dc.style.cursor = errorMode ? 'cell' : 'crosshair';
-    if(errorMode) status('Error-bar mode — click a point then drag to set ± size.');
-    else status('Click to add a point. Right-click to delete.');
     if(dragging && !errorMode && graphType !== 'bar') handlePlotClick(px, py);
     if(dragging && graphType === 'histogram') handlePlotClick(px, py);
   } else {
     dc.style.cursor = 'default';
-    status(errorMode
-      ? 'Error-bar mode — click a data point and drag to set ± error.'
-      : 'Click inside the plot area to add data. Right-click to delete.');
   }
 });
 
@@ -1118,7 +1390,6 @@ dc.addEventListener('mouseup', e => {
     const errVal   = Math.abs(draggedY - errDrag.anchorDataY);
     series[activeSer].points[errDrag.ptIdx].err = parseFloat(errVal.toFixed(3));
     redraw();
-    status('Error bar set.');
     errDrag = null;
     return;
   }
@@ -1142,14 +1413,16 @@ function handlePlotClick(px, py){
   const xv = px2x(px), yv = px2y(py);
 
   if(graphType === 'bar'){
-    if(!categories.length){ status('Add at least one X-category first, then click.'); return; }
+    if(!categories.length){
+      showCategoryArrow();
+      return;
+    }
     const ci = Math.floor((px - M.left) / pW() * categories.length);
     if(ci < 0 || ci >= categories.length) return;
     const existing = series[activeSer].points.findIndex(p => p.cat === ci);
     const ySnap = parseFloat(yv.toFixed(3));
     if(existing !== -1) series[activeSer].points[existing].y = ySnap;
     else series[activeSer].points.push({ cat: ci, y: ySnap, err: 0 });
-    status(`Set ${categories[ci]} = ${ySnap} for ${series[activeSer].label}`);
   } else if(graphType === 'histogram'){
     const start = histBinStart(), bw = histBinWidth(), n = histBinCount();
     const dataX = xv;
@@ -1168,21 +1441,38 @@ function handlePlotClick(px, py){
 }
 
 // ════════════════════════════════════════════════
-//  CATEGORY MANAGEMENT
+//  CATEGORY MANAGEMENT & ARROW LOGIC
 // ════════════════════════════════════════════════
-function onXLabelChange(){
-  redraw();
+let arrowTimeout = null;
+
+function showCategoryArrow(){
+  const hint = document.getElementById('cat-arrow-hint');
+  const inp  = document.getElementById('cat-input');
+  if(!hint || !inp) return;
+
+  hint.style.display = 'flex';
+  inp.classList.add('needs-input');
+  inp.focus();
+
+  if(arrowTimeout) clearTimeout(arrowTimeout);
+  arrowTimeout = setTimeout(() => {
+    hideCategoryArrow();
+  }, 4000);
 }
 
+function hideCategoryArrow(){
+  const hint = document.getElementById('cat-arrow-hint');
+  if(hint) hint.style.display = 'none';
+}
+
+function onXLabelChange(){ redraw(); }
+
 function updateCatHint(needsInput){
-  const inp  = document.getElementById('cat-input');
-  const hint = document.getElementById('cat-hint');
+  const inp = document.getElementById('cat-input');
   if(needsInput && graphType === 'bar'){
     inp.classList.add('needs-input');
-    hint.style.display = 'block';
   } else {
     inp.classList.remove('needs-input');
-    hint.style.display = 'none';
   }
 }
 
@@ -1192,6 +1482,7 @@ function addCategory(){
   if(!val) return;
   categories.push(val);
   inp.value='';
+  hideCategoryArrow();
   renderCatList();
   updateCatHint(false);
   redraw();
@@ -1221,36 +1512,103 @@ function renderCatList(){
 }
 
 // ════════════════════════════════════════════════
-//  SERIES MANAGEMENT
+//  SERIES MANAGEMENT & COLOR PICKER
 // ════════════════════════════════════════════════
-function addSeries(){
-  if(series.length>=6){ status('Max 6 series.'); return; }
+let pendingColorCallback = null;
+const hiddenColorInput = document.getElementById('hidden-custom-color');
+hiddenColorInput.addEventListener('input', (e) => {
+  if(pendingColorCallback){
+    pendingColorCallback(e.target.value);
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.color-picker-custom')){
+    document.querySelectorAll('.color-menu.open').forEach(m => m.classList.remove('open'));
+  }
+});
+
+function createColorSelect(currentColor, onChangeCallback){
+  const container = document.createElement('div');
+  container.className = 'color-picker-custom';
+
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'color-trigger';
+  trigger.style.backgroundColor = currentColor;
+  trigger.title = 'Change color';
+
+  const arrow = document.createElement('span');
+  arrow.className = 'arrow';
+  trigger.appendChild(arrow);
+
+  const menu = document.createElement('div');
+  menu.className = 'color-menu';
+
+  const grid = document.createElement('div');
+  grid.className = 'color-palette-grid';
+
+  PRESET_COLORS.forEach(c => {
+    const swatch = document.createElement('div');
+    swatch.className = 'color-palette-swatch';
+    swatch.style.backgroundColor = c.value;
+    swatch.title = c.name;
+    swatch.onclick = (e) => {
+      e.stopPropagation();
+      menu.classList.remove('open');
+      trigger.style.backgroundColor = c.value;
+      onChangeCallback(c.value);
+    };
+    grid.appendChild(swatch);
+  });
+
+  const customBtn = document.createElement('button');
+  customBtn.type = 'button';
+  customBtn.className = 'custom-hex-btn';
+  customBtn.textContent = 'Custom Hex…';
+  customBtn.onclick = (e) => {
+    e.stopPropagation();
+    menu.classList.remove('open');
+    pendingColorCallback = (newHex) => {
+      trigger.style.backgroundColor = newHex;
+      onChangeCallback(newHex);
+    };
+    hiddenColorInput.value = currentColor.startsWith('#') && currentColor.length === 7 ? currentColor : '#0072B2';
+    hiddenColorInput.click();
+  };
+
+  menu.appendChild(grid);
+  menu.appendChild(customBtn);
+
+  trigger.onclick = (e) => {
+    e.stopPropagation();
+    const isOpen = menu.classList.contains('open');
+    document.querySelectorAll('.color-menu.open').forEach(m => m.classList.remove('open'));
+    if(!isOpen) menu.classList.add('open');
+  };
+
+  container.appendChild(trigger);
+  container.appendChild(menu);
+  return container;
+}
+
+function addSeries(focusNew = false){
+  if(series.length>=8) return;
   series.push({ label:`Series ${series.length+1}`, color:COLORS[series.length%COLORS.length], points:[], errors:[] });
   activeSer=series.length-1;
   if(graphType !== 'histogram') document.getElementById('bar-ser-picker').style.display = 'flex';
   renderSerSelect();
-  renderLegList();
+  renderLegList(focusNew ? series.length - 1 : -1);
   redraw();
 }
 
 function setActiveSeries(i){
   activeSer=i;
   renderBarSerPicker();
-  status(`Drawing on: ${series[i].label}`);
-}
-
-function setSeriesColor(c){
-  series[activeSer].color=c;
-  if(graphType === 'histogram'){
-    const hc = document.getElementById('hist-color');
-    if(hc) hc.value = c;
-  }
-  renderLegList();
-  redraw();
 }
 
 function removeSeries(i){
-  if(series.length===1){ status('Cannot remove the last series.'); return; }
+  if(series.length===1) return;
   series.splice(i,1);
   if(activeSer>=series.length) activeSer=series.length-1;
   renderSerSelect();
@@ -1274,41 +1632,69 @@ function renderBarSerPicker(){
   });
 }
 
-function renderLegList(){
+function renderHistColorPicker(){
+  const wrap = document.getElementById('hist-color-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  const colorSelect = createColorSelect(series[0].color, (newColor) => {
+    series[0].color = newColor;
+    redraw();
+  });
+  wrap.appendChild(colorSelect);
+}
+
+function renderLegList(focusIndex = -1){
   const el=document.getElementById('leg-list');
   el.innerHTML='';
   series.forEach((s,i)=>{
     const row=document.createElement('div');
     row.className='leg-row';
-    row.innerHTML=`
-      <input type="color" value="${s.color}" onchange="series[${i}].color=this.value;renderSerSelect();redraw()">
-      <input type="text" value="${s.label}" placeholder="Label…" oninput="series[${i}].label=this.value;renderSerSelect();redraw()">
-      <button onclick="removeSeries(${i})">✕</button>`;
+
+    const colorSelect = createColorSelect(s.color, (newColor) => {
+      series[i].color = newColor;
+      renderSerSelect();
+      redraw();
+    });
+
+    const labelInput = document.createElement('input');
+    labelInput.type = 'text';
+    labelInput.id = `leg-inp-${i}`;
+    labelInput.value = s.label;
+    labelInput.oninput = () => {
+      series[i].label = labelInput.value;
+      renderSerSelect();
+      redraw();
+    };
+    labelInput.onkeydown = (event) => {
+      if(event.key === 'Enter'){
+        event.preventDefault();
+        addSeries(true);
+      }
+    };
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'del-btn';
+    delBtn.textContent = '✕';
+    delBtn.onclick = () => removeSeries(i);
+
+    row.appendChild(colorSelect);
+    row.appendChild(labelInput);
+    row.appendChild(delBtn);
     el.appendChild(row);
   });
+
+  if(focusIndex >= 0 && focusIndex < series.length){
+    const targetInp = document.getElementById(`leg-inp-${focusIndex}`);
+    if(targetInp){
+      targetInp.focus();
+      targetInp.select();
+    }
+  }
 }
 
 // ════════════════════════════════════════════════
-//  TOOLBAR TOGGLES
+//  TOOLBAR TOGGLES & TYPES
 // ════════════════════════════════════════════════
-
-function onGroupsChange(){
-  const n = Math.max(1, Math.min(6, parseInt(document.getElementById('inp-groups').value)||1));
-  document.getElementById('inp-groups').value = n;
-  while(series.length < n){
-    series.push({ label:`Series ${series.length+1}`, color:COLORS[series.length%COLORS.length], points:[], errors:[] });
-  }
-  while(series.length > n){
-    series.pop();
-  }
-  if(activeSer >= series.length) activeSer = series.length - 1;
-  document.getElementById('leg-section').style.display = 'block';
-  if(graphType !== 'histogram') document.getElementById('bar-ser-picker').style.display = 'flex';
-  renderSerSelect();
-  renderLegList();
-  redraw();
-}
-
 function setScaleDefaults(type){
   if(type === 'bar'){
     document.getElementById('inp-ymin').value  = '-10';
@@ -1331,7 +1717,6 @@ function setScaleDefaults(type){
 function setType(t){
   graphType = t;
 
-  // Unlock secondary toolbar & main config panel
   document.getElementById('secondary-tools').classList.remove('controls-locked');
   document.getElementById('main-config').classList.remove('controls-locked');
 
@@ -1343,14 +1728,19 @@ function setType(t){
   const isCat  = (t === 'bar');
   const isHist = (t === 'histogram');
 
+  const legTitle = document.getElementById('leg-title');
+  if(legTitle){
+    legTitle.textContent = isCat ? 'Groups within X-Categories' : 'Legend / Series';
+  }
+
   document.getElementById('cat-section').style.display  = isCat  ? 'block' : 'none';
   document.getElementById('hist-section').style.display = isHist ? 'block' : 'none';
 
   document.getElementById('leg-section').style.display  = 'block';
   document.getElementById('leg-normal').style.display   = isHist ? 'none' : 'block';
   document.getElementById('leg-hist').style.display     = isHist ? 'block' : 'none';
-  if(isHist) document.getElementById('hist-color').value = series[0].color;
-  document.getElementById('tg-addseries').style.display = (isCat || isHist) ? 'none' : '';
+  if(isHist) renderHistColorPicker();
+  document.getElementById('tg-addseries').style.display = isHist ? 'none' : '';
 
   const showXScale = (!isCat && !isHist);
   const xrow = document.getElementById('xscale-row');
@@ -1358,9 +1748,7 @@ function setType(t){
   xrow.style.flexWrap   = 'nowrap';
 
   document.getElementById('bar-ser-picker').style.display = isHist ? 'none' : 'flex';
-
   document.getElementById('btn-bf').style.opacity = t === 'scatter' ? '1' : '0.4';
-
   document.getElementById('btn-eb').style.opacity = isHist ? '0.4' : '1';
   if(isHist && errorMode){ errorMode = false; document.getElementById('btn-eb').classList.remove('active'); }
 
@@ -1370,25 +1758,27 @@ function setType(t){
   }
 
   setScaleDefaults(t);
-
-  if(isCat) onGroupsChange();
-
   series.forEach(s => s.points = []);
 
+  hideCategoryArrow();
   updateCatHint(isCat && categories.length === 0);
-
   document.getElementById('hist-hint').style.display = isHist ? 'block' : 'none';
 
   renderSerSelect();
   renderLegList();
   redraw();
-  status('Graph type changed — click in the plot area to add data.');
 }
 
 function toggleBestFit(){
-  if(graphType!=='scatter'){ status('Best-fit line is only available for Scatter plots.'); return; }
+  if(graphType!=='scatter') return;
   showBestFit=!showBestFit;
   document.getElementById('btn-bf').classList.toggle('active',showBestFit);
+  redraw();
+}
+
+function toggleMinorGrid(){
+  showMinorGrid = !showMinorGrid;
+  document.getElementById('btn-mg').classList.toggle('active', showMinorGrid);
   redraw();
 }
 
@@ -1397,17 +1787,11 @@ function toggleDeleteMode(){
   if(deleteMode && errorMode){ errorMode = false; document.getElementById('btn-eb').classList.remove('active'); }
   document.getElementById('btn-delete').classList.toggle('active', deleteMode);
   dc.style.cursor = deleteMode ? 'not-allowed' : 'crosshair';
-  status(deleteMode
-    ? '🗑 Delete mode ON — click a bar or point to remove it. Click 🗑 Delete again to exit.'
-    : 'Delete mode off.');
 }
 
 function toggleErrorBars(){
   errorMode=!errorMode;
   document.getElementById('btn-eb').classList.toggle('active',errorMode);
-  status(errorMode
-    ? '± Error mode ON — click a data point to enter its error value. Click ± Error again to exit.'
-    : 'Error-bar mode off.');
 }
 
 function deleteNearest(px, py){
@@ -1420,12 +1804,8 @@ function deleteNearest(px, py){
     const idx = series[activeSer].points.findIndex(p => p.cat === ci);
     if(idx !== -1){
       series[activeSer].points.splice(idx, 1);
-      status(`Removed "${categories[ci]}" bar from ${series[activeSer].label}.`);
       redraw();
-    } else {
-      status('No bar found in that column.');
     }
-
   } else if(graphType === 'histogram'){
     const start = histBinStart(), bw = histBinWidth(), n = histBinCount();
     const xv = px2x(px);
@@ -1434,12 +1814,8 @@ function deleteNearest(px, py){
     const idx = series[0].points.findIndex(p => p.binIdx === binIdx);
     if(idx !== -1){
       series[0].points.splice(idx, 1);
-      status(`Cleared bin ${binIdx + 1}.`);
       redraw();
-    } else {
-      status('That bin is already empty.');
     }
-
   } else {
     let bestDist = Infinity, bestSer = -1, bestIdx = -1;
     series.forEach((s, si) => {
@@ -1450,10 +1826,7 @@ function deleteNearest(px, py){
     });
     if(bestDist <= HIT && bestSer !== -1){
       series[bestSer].points.splice(bestIdx, 1);
-      status(`Point removed from ${series[bestSer].label}.`);
       redraw();
-    } else {
-      status('Click closer to a point to delete it.');
     }
   }
 }
@@ -1462,7 +1835,6 @@ function undoLast(){
   if(series[activeSer].points.length){
     series[activeSer].points.pop();
     redraw();
-    status('Last point removed.');
   }
 }
 
@@ -1470,11 +1842,94 @@ function clearAll(){
   if(!confirm('Clear all data points?')) return;
   series.forEach(s=>s.points=[]);
   redraw();
-  status('Graph cleared.');
 }
 
 // ════════════════════════════════════════════════
-//  COMPOSE FINAL IMAGE (all 3 layers)
+//  SAVE & LOAD PROJECT (.json)
+// ════════════════════════════════════════════════
+function saveProject(){
+  const projectData = {
+    version: '1.6.0',
+    graphType,
+    title: document.getElementById('inp-title').value,
+    xlabel: document.getElementById('inp-xlabel').value,
+    ylabel: document.getElementById('inp-ylabel').value,
+    xmin: document.getElementById('inp-xmin').value,
+    xmax: document.getElementById('inp-xmax').value,
+    xstep: document.getElementById('inp-xstep').value,
+    ymin: document.getElementById('inp-ymin').value,
+    ymax: document.getElementById('inp-ymax').value,
+    ystep: document.getElementById('inp-ystep').value,
+    binstart: document.getElementById('inp-binstart').value,
+    binwidth: document.getElementById('inp-binwidth').value,
+    bincount: document.getElementById('inp-bincount').value,
+    showBestFit,
+    showMinorGrid,
+    categories,
+    series
+  };
+
+  const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  const now = new Date();
+  const stamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  a.download = `QuickPlot_Project_${stamp}.json`;
+  a.href = URL.createObjectURL(blob);
+  a.click();
+}
+
+function handleFileLoad(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(!data.graphType){
+        alert('Invalid QuickPlot project file format.');
+        return;
+      }
+
+      document.getElementById('inp-title').value = data.title || '';
+      document.getElementById('inp-xlabel').value = data.xlabel || '';
+      document.getElementById('inp-ylabel').value = data.ylabel || '';
+      document.getElementById('inp-xmin').value = data.xmin ?? '0';
+      document.getElementById('inp-xmax').value = data.xmax ?? '10';
+      document.getElementById('inp-xstep').value = data.xstep ?? '';
+      document.getElementById('inp-ymin').value = data.ymin ?? '-10';
+      document.getElementById('inp-ymax').value = data.ymax ?? '10';
+      document.getElementById('inp-ystep').value = data.ystep ?? '1';
+
+      if(data.binstart) document.getElementById('inp-binstart').value = data.binstart;
+      if(data.binwidth) document.getElementById('inp-binwidth').value = data.binwidth;
+      if(data.bincount) document.getElementById('inp-bincount').value = data.bincount;
+
+      setType(data.graphType);
+
+      categories = data.categories || [];
+      series = data.series || [];
+
+      showBestFit = !!data.showBestFit;
+      document.getElementById('btn-bf').classList.toggle('active', showBestFit);
+
+      showMinorGrid = !!data.showMinorGrid;
+      document.getElementById('btn-mg').classList.toggle('active', showMinorGrid);
+
+      renderCatList();
+      renderSerSelect();
+      renderLegList();
+      redraw();
+    } catch(err){
+      alert('Failed to load project: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ════════════════════════════════════════════════
+//  EXPORT COMPOSITION
 // ════════════════════════════════════════════════
 const EXPORT_SIZE = 500;
 
@@ -1485,7 +1940,6 @@ function compositeCanvas(){
   const EX = EXPORT_SIZE;
 
   const savedW = W, savedH = H;
-
   W = EX; H = EX;
   [gc, dc, oc].forEach(c => { c.width = EX; c.height = EX; });
   drawGrid(); drawData(); drawOverlay();
@@ -1502,7 +1956,7 @@ function compositeCanvas(){
     t.beginPath(); t.moveTo(0, legH); t.lineTo(EX, legH); t.stroke();
     const items = [...legendEl.querySelectorAll('.hl-item')];
     const totalW = items.reduce((sum, item) => {
-      t.font = '11px system-ui, Arial, sans-serif';
+      t.font = "11px 'Arial Narrow', Arial, sans-serif";
       return sum + 16 + 5 + t.measureText(item.querySelector('span').textContent).width + 14;
     }, -14);
     let cx = (EX - totalW) / 2;
@@ -1515,7 +1969,7 @@ function compositeCanvas(){
         t.fillStyle = color; t.fillRect(cx, legH/2 - 6, 16, 12);
         t.strokeStyle = darken(color); t.lineWidth = 0.8; t.strokeRect(cx, legH/2 - 6, 16, 12);
       }
-      t.fillStyle = '#1e2a3a'; t.font = '11px system-ui, Arial, sans-serif';
+      t.fillStyle = '#1e2a3a'; t.font = "11px 'Arial Narrow', Arial, sans-serif";
       t.textAlign = 'left'; t.textBaseline = 'middle';
       t.fillText(label, cx + 21, legH/2);
       cx += 16 + 5 + t.measureText(label).width + 14;
@@ -1543,7 +1997,6 @@ async function downloadPNG(){
   a.download = `Graph_${stamp}.png`;
   a.href = tmp.toDataURL('image/png');
   a.click();
-  status(`✓ Downloaded as Graph_${stamp}.png — attach it in Synergy.`);
 }
 
 async function copyPNG(){
@@ -1552,11 +2005,9 @@ async function copyPNG(){
   tmp.toBlob(async blob=>{
     try{
       await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-      status('✓ Graph copied to clipboard — paste it into Synergy\'s answer field.');
     } catch(err){
       const url=URL.createObjectURL(blob);
       window.open(url,'_blank');
-      status('Clipboard blocked by browser — graph opened in new tab. Right-click → Save/Copy Image.');
     }
   },'image/png');
 }
@@ -1579,8 +2030,6 @@ requestAnimationFrame(() => {
     redraw();
   });
 });
-
-status('');
 </script>
 </body>
 </html>
