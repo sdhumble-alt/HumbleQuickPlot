@@ -4,19 +4,68 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>A Humble Quick Plot</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/webfont/tabler-icons.min.css">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── DESIGN SYSTEM VARIABLES & RESET ── */
+:root {
+  --header-bg: #1e2a3a;
+  --header-border: #12202e;
+  --header-title: #ffffff;
+  --header-sub: rgba(255, 255, 255, 0.65);
+  --header-ver: rgba(255, 255, 255, 0.45);
 
-html {
-  height: 100%;
+  --app-window-bg: #f0f2f5;
+  --app-panel-bg: #ffffff;
+  --stage-bg: #f9fafc;
+
+  --card-border: #cbd5e1;
+  --card-header-bg: #f8fafc;
+  --card-header-border: #e2e8f0;
+  --card-header-title: #475569;
+  --card-header-icon: #64748b;
+
+  --input-border: #cbd5e1;
+  --input-border-hover: #94a3b8;
+  --input-border-focus: #3266ad;
+  --input-focus-ring: rgba(50, 102, 173, 0.15);
+  --input-text: #1e2a3a;
+  --input-label: #475569;
+
+  --btn-primary-bg: #3266ad;
+  --btn-primary-hover: #185fa5;
+  --btn-primary-text: #ffffff;
+
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-border: #cbd5e1;
+  --btn-secondary-hover-bg: #f1f5f9;
+  --btn-secondary-hover-border: #94a3b8;
+  --btn-secondary-text: #334155;
+
+  --btn-green-bg: #1a7a3a;
+  --btn-green-hover: #145e2c;
+  --btn-green-text: #ffffff;
+
+  --btn-danger-bg: #b00020;
+  --btn-danger-hover: #8e001a;
+  --btn-danger-text: #ffffff;
+
+  --sidebar-min-width: 340px;
+  --sidebar-max-width: 380px;
+  --split-gap: 18px;
+  --split-padding: 16px;
 }
 
-body {
-  background: #f0f2f5;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100vh;
+  overflow: hidden;
   font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
-  color: #1e2a3a;
-  height: 100%; overflow: hidden;
-  display: flex; flex-direction: column;
+  font-size: 11pt;
+  background: var(--app-window-bg);
+  color: var(--input-text);
+  display: flex;
+  flex-direction: column;
 }
 
 #app {
@@ -25,122 +74,318 @@ body {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  background: var(--app-panel-bg);
 }
 
-/* ── TOP HEADER ── */
+/* ── HEADER & BRANDING ── */
 #app-header {
-  background: #1e2a3a;
-  padding: 9px 16px 8px;
-  display: flex; align-items: center; justify-content: space-between;
+  background: var(--header-bg);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   flex-shrink: 0;
-  border-bottom: 1px solid #12202e;
+  border-bottom: 1px solid var(--header-border);
 }
+
+.header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 #app-title {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 15px; font-weight: bold;
-  color: #fff; letter-spacing: 0.01em;
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--header-title);
+  letter-spacing: 0.01em;
+  line-height: 1.2;
   white-space: nowrap;
-}
-#app-subtitle {
-  font-size: 10px; color: rgba(255,255,255,0.58);
-  font-style: italic; white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* ── MAIN BODY ── */
-#app-body {
+#app-title i {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+#app-subtitle {
+  font-size: 10px;
+  color: var(--header-sub);
+  font-style: italic;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolbar-ver {
+  font-size: 8pt;
+  color: var(--header-ver);
+  font-family: Arial, sans-serif;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+/* ── SPLIT LAYOUT ── */
+.content {
   display: flex;
   flex: 1;
   overflow: hidden;
   min-height: 0;
-  height: 0;
 }
 
-/* ── LEFT CONTROL PANEL ── */
-#left-panel {
-  width: 300px;
-  flex-shrink: 0;
+.split-layout {
+  display: grid;
+  grid-template-columns: minmax(var(--sidebar-min-width), var(--sidebar-max-width)) 1fr;
+  gap: var(--split-gap);
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  align-items: stretch;
+  padding: var(--split-padding);
+}
+
+.split-left {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.split-right {
+  height: 100%;
+  overflow-y: auto;
+  background: var(--stage-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  background: #fff;
-  border-right: 1px solid #d0d7e2;
-  height: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
 }
 
-/* ── RIGHT GRAPH AREA ── */
-#right-canvas {
-  flex: 1;
-  min-width: 0;
-  min-height: 0;
-  background: #f0f2f5;
+/* ── OPT-GROUP CARDS ── */
+.opt-group {
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  margin-bottom: 14px;
+  overflow: visible;
+  background: var(--app-panel-bg);
+}
+
+.opt-group-header {
+  background: var(--card-header-bg);
+  padding: 8px 12px;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--card-header-border);
+  border-radius: 7px 7px 0 0;
+}
+
+.opt-group-header-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.opt-group-header i {
+  font-size: 14px;
+  color: var(--card-header-icon);
+}
+
+.opt-group-title {
+  font-size: 8.5pt;
+  font-weight: 700;
+  color: var(--card-header-title);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.opt-group-body {
+  padding: 12px;
+}
+
+/* ── FORM ELEMENTS ── */
+input[type=text],
+input[type=number],
+select {
+  border: 1.5px solid var(--input-border);
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-size: 10pt;
+  font-family: Arial, sans-serif;
+  background: #ffffff;
+  color: var(--input-text);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type=text]:hover,
+input[type=number]:hover,
+select:hover {
+  border-color: var(--input-border-hover);
+}
+
+input[type=text]:focus,
+input[type=number]:focus,
+select:focus {
+  border-color: var(--input-border-focus);
+  border-width: 2px;
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
+input[type=number] {
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.field-row label {
+  font-size: 9.5pt;
+  color: var(--input-label);
+  font-weight: 600;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  height: 100%;
-}
-
-/* ── GRAPH STACK ── */
-#graph-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-#graph-wrap {
-  position: relative;
-  background: #fff;
-  flex-shrink: 0;
-  box-shadow: 0 2px 12px rgba(30,42,58,0.10);
-}
-
-/* ── TOOLBAR ── */
-#toolbar {
-  background: #f4f6f9;
-  border-bottom: 1px solid #d0d7e2;
-  padding: 7px 10px;
-  display: flex;
-  flex-direction: column;
   gap: 5px;
-  flex-shrink: 0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 9.5pt;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .12s ease-in-out;
+  border: none;
+  white-space: nowrap;
+  background: transparent;
+  line-height: 1.3;
 }
-.tb-row {
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary { background: var(--btn-primary-bg); color: var(--btn-primary-text); }
+.btn-primary:hover:not(:disabled) { background: var(--btn-primary-hover); }
+
+.btn-secondary { background: var(--btn-secondary-bg); color: var(--btn-secondary-text); border: 1.5px solid var(--btn-secondary-border); }
+.btn-secondary:hover:not(:disabled) { background: var(--btn-secondary-hover-bg); border-color: var(--btn-secondary-hover-border); }
+
+.btn-secondary.active-mode {
+  background: #eef3fb;
+  border-color: var(--btn-primary-bg);
+  color: #1e429f;
+  box-shadow: 0 0 0 2px var(--input-focus-ring);
+}
+
+.btn-green { background: var(--btn-green-bg); color: var(--btn-green-text); }
+.btn-green:hover:not(:disabled) { background: var(--btn-green-hover); }
+
+.btn-danger { background: var(--btn-danger-bg); color: var(--btn-danger-text); }
+.btn-danger:hover:not(:disabled) { background: var(--btn-danger-hover); }
+
+.btn-row {
   display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 8.5pt;
+}
+
+.btn-header {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+.btn-header:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── ACTION GRID (GRAPH TYPES) ── */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.act-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 4px;
-}
-.tg { display: flex; gap: 3px; align-items: center; }
-.tg + .tg { border-left: 1px solid #d0d7e2; padding-left: 7px; margin-left: 2px; }
-.tg-label { font-size: 10px; color: #6b7a90; white-space: nowrap; margin-right: 2px; }
-
-button.tb {
-  font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
-  font-size: 11px; font-weight: 500;
-  padding: 4px 9px; border: 1px solid #c8d0dc; background: #fff;
-  cursor: pointer; border-radius: 5px; white-space: nowrap; line-height: 1.3;
-  color: #1e2a3a; transition: background 0.1s, border-color 0.1s;
-}
-button.tb:hover { background: #edf0f5; border-color: #a8b4c4; }
-button.tb.active { background: #1d5fc4; color: #fff; border-color: #1548a0; }
-button.tb.green  { background: #1a7a3a; color: #fff; border-color: #145e2c; }
-button.tb.green:hover { background: #145e2c; }
-button.tb.red    { color: #b00020; border-color: #e0a0aa; }
-button.tb.red:hover { background: #fff0f2; }
-
-select.tb {
-  font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
-  font-size: 11px; font-weight: 500;
-  padding: 3px 5px; border: 1px solid #c8d0dc; background: #fff;
-  border-radius: 5px; cursor: pointer; max-width: 90px; color: #1e2a3a;
+  padding: 8px 4px;
+  background: #f8fafc;
+  border: 1.5px solid var(--card-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 8.5pt;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  color: #334155;
+  transition: all .12s;
+  text-align: center;
 }
 
-canvas { position: absolute; top: 0; left: 0; }
-#dc { cursor: crosshair; }
-#oc { pointer-events: none; }
+.act-btn:hover:not(:disabled) {
+  background: #eef3fb;
+  border-color: var(--btn-primary-bg);
+  color: #1e429f;
+}
 
-/* ── LOCKED CONTROLS ── */
+.act-btn.active-mode {
+  background: #eef3fb;
+  border-color: var(--btn-primary-bg);
+  color: #1e429f;
+  box-shadow: 0 0 0 2px var(--input-focus-ring);
+}
+
+.act-btn i {
+  font-size: 18px;
+}
+
+/* ── CONTROLS LOCK ── */
 .controls-locked {
   opacity: 0.35;
   pointer-events: none;
@@ -149,97 +394,71 @@ canvas { position: absolute; top: 0; left: 0; }
   transition: opacity 0.2s, filter 0.2s;
 }
 
-/* ── SECTIONS ── */
-.section {
-  border-top: 1px solid #e4e8ef;
-  background: #f9fafc;
-  padding: 7px 12px;
-}
-.row {
-  display: flex; align-items: center; gap: 5px;
-  margin-bottom: 4px; flex-wrap: wrap;
-}
-.row:last-child { margin-bottom: 0; }
-.row label {
-  font-size: 11px; color: #4a5568; font-weight: 500;
-  white-space: nowrap; width: 84px; flex-shrink: 0;
-}
-.row input[type=text] {
-  flex: 1; min-width: 80px;
-  font-family: Georgia, 'Times New Roman', serif; font-size: 11px;
-  padding: 3px 6px; border: 1px solid #c8d0dc; border-radius: 5px;
-  background: #fff; color: #1e2a3a;
-}
-.row input[type=text]:focus { outline: none; border-color: #1d5fc4; box-shadow: 0 0 0 2px rgba(29,95,196,0.15); }
-
-/* ── NUMBER INPUTS (CENTER JUSTIFIED & NO SPINNERS) ── */
-.row input[type=number] {
-  width: 44px; font-size: 11px;
-  padding: 3px 4px; border: 1px solid #c8d0dc; border-radius: 5px;
-  text-align: center; background: #fff; color: #1e2a3a;
-  -moz-appearance: textfield;
-}
-.row input[type=number]::-webkit-outer-spin-button,
-.row input[type=number]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-.row input[type=number]:focus { outline: none; border-color: #1d5fc4; }
-
-.row .mini-label {
-  font-size: 10px; color: #6b7a90;
-  white-space: nowrap; flex-shrink: 0;
-}
-
-/* ── SYMBOL BAR & FORMATTING BUTTONS ── */
+/* ── SYMBOL TOOLBAR ── */
 .symbol-bar {
-  display: flex; align-items: center; justify-content: space-between; gap: 6px;
-  margin-bottom: 6px; padding: 4px 6px;
-  background: #edf2f7; border-radius: 5px; border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding: 6px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  border: 1px solid var(--card-border);
 }
-.symbol-bar select {
-  flex: 1;
-  font-size: 11px; padding: 3px 6px; border: 1px solid #c8d0dc;
-  border-radius: 4px; background: #fff; cursor: pointer; color: #1e2a3a;
-}
+
 .fmt-btn {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 11px; font-weight: bold;
-  padding: 2px 7px; border: 1px solid #c8d0dc; background: #fff;
-  border-radius: 4px; cursor: pointer; color: #1e2a3a;
+  font-size: 9.5pt;
+  font-weight: bold;
+  padding: 5px 9px;
+  border: 1.5px solid var(--card-border);
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #1e2a3a;
   line-height: 1.2;
 }
 .fmt-btn:hover { background: #e2e8f0; }
 
-/* ── CATEGORY EDITOR ── */
-#cat-section { display: none; }
+/* ── CATEGORIES LIST ── */
 #cat-list {
-  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
 }
-.cat-tag {
-  display: flex; align-items: center; gap: 3px;
-  background: #e8eef8; border: 1px solid #b8c8e8; border-radius: 12px;
-  padding: 2px 8px 2px 10px; font-size: 11px; color: #1e2a3a;
-}
-.cat-tag button {
-  background: none; border: none; cursor: pointer;
-  font-size: 12px; color: #8899bb; padding: 0 0 0 2px; line-height: 1;
-}
-.cat-tag button:hover { color: #b00020; }
-#cat-input-wrap { display: flex; gap: 5px; margin-top: 5px; }
-#cat-input-wrap input {
-  flex: 1; font-size: 11px;
-  padding: 3px 7px; border: 1px solid #c8d0dc; border-radius: 5px;
-  background: #fff;
-}
-#cat-input-wrap button {
-  font-size: 11px; font-weight: 500;
-  padding: 3px 10px; border: 1px solid #c8d0dc; background: #fff;
-  cursor: pointer; border-radius: 5px; color: #1e2a3a;
-}
-#cat-input-wrap button:hover { background: #edf0f5; }
 
-/* ── CATEGORY RED HIGHLIGHT & ARROW ── */
+.cat-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #eef3fb;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 2px 8px 2px 10px;
+  font-size: 9pt;
+  color: #1e429f;
+  font-weight: 500;
+}
+
+.cat-tag button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #64748b;
+  padding: 0 0 0 2px;
+  line-height: 1;
+}
+.cat-tag button:hover { color: var(--btn-danger-bg); }
+
+#cat-input-wrap {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
 #cat-input-wrap input.needs-input {
   border-color: #d55e00;
   box-shadow: 0 0 0 2px rgba(213, 94, 0, 0.25);
@@ -255,10 +474,9 @@ canvas { position: absolute; top: 0; left: 0; }
   align-items: center;
   gap: 5px;
   color: #d55e00;
-  font-size: 10.5px;
+  font-size: 9pt;
   font-weight: 600;
-  margin-top: 5px;
-  padding: 1px 2px;
+  margin-top: 6px;
   animation: bounce-arrow 0.8s ease-in-out infinite alternate;
 }
 @keyframes bounce-arrow {
@@ -266,64 +484,75 @@ canvas { position: absolute; top: 0; left: 0; }
   100% { transform: translateY(-3px); }
 }
 
-/* ── LEGEND EDITOR & CUSTOM COLOR SELECTOR ── */
-.leg-hdr {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 5px;
+/* ── SERIES / LEGEND ROWS ── */
+#leg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-.leg-hdr span { font-size: 11px; color: #4a5568; font-weight: 600; }
-#leg-list { display: flex; flex-direction: column; gap: 4px; }
-.leg-row { display: flex; align-items: center; gap: 5px; }
-.leg-row input[type=text]  { flex:1; font-size:11px; padding:3px 5px; border:1px solid #c8d0dc; border-radius:5px; background:#fff; }
-.leg-row button.del-btn { font-size:11px; padding:2px 6px; border:1px solid #e0a0aa; background:#fff; cursor:pointer; border-radius:5px; color:#b00020; }
-.leg-row button.del-btn:hover { background: #fff0f2; }
 
-/* ── COLOR DROPDOWN COMPONENT ── */
+.leg-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.leg-row .del-btn {
+  padding: 5px 8px;
+}
+
+/* ── COLOR PICKER DROPDOWN ── */
 .color-picker-custom {
   position: relative;
   display: inline-block;
   flex-shrink: 0;
 }
+
 .color-trigger {
-  width: 32px;
-  height: 22px;
-  border: 1px solid #c8d0dc;
-  border-radius: 5px;
+  width: 30px;
+  height: 24px;
+  border: 1.5px solid var(--card-border);
+  border-radius: 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 0 3px;
-  background: #fff;
+  padding: 0 4px;
+  background: #ffffff;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
 }
+
 .color-trigger .arrow {
-  width: 0; height: 0;
+  width: 0;
+  height: 0;
   border-left: 3px solid transparent;
   border-right: 3px solid transparent;
-  border-top: 4px solid rgba(0,0,0,0.6);
-  filter: drop-shadow(0 1px 0 rgba(255,255,255,0.8));
+  border-top: 4px solid rgba(0,0,0,0.65);
 }
+
 .color-menu {
   display: none;
   position: absolute;
-  top: calc(100% + 3px);
+  top: calc(100% + 4px);
   left: 0;
   z-index: 100;
-  background: #fff;
-  border: 1px solid #c8d0dc;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   padding: 6px;
-  width: 122px;
+  width: 124px;
 }
+
 .color-menu.open { display: block; }
+
 .color-palette-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 5px;
   margin-bottom: 6px;
 }
+
 .color-palette-swatch {
   width: 22px;
   height: 22px;
@@ -332,88 +561,110 @@ canvas { position: absolute; top: 0; left: 0; }
   border: 1px solid rgba(0,0,0,0.15);
   transition: transform 0.05s;
 }
+
 .color-palette-swatch:hover {
   transform: scale(1.15);
   border-color: #1e2a3a;
 }
+
 .custom-hex-btn {
   width: 100%;
   padding: 4px 6px;
-  font-size: 10px;
+  font-size: 8pt;
   font-weight: 500;
-  border: 1px solid #c8d0dc;
+  border: 1px solid var(--card-border);
   border-radius: 4px;
-  background: #f4f6f9;
+  background: #f8fafc;
   cursor: pointer;
   text-align: center;
   color: #1e2a3a;
   display: block;
 }
+
 .custom-hex-btn:hover {
-  background: #e5e9f0;
+  background: #eef3fb;
 }
 
-/* ── BAR SERIES PICKER ── */
+/* ── CANVAS & STAGE ── */
+#graph-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.canvas-wrapper {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+canvas { position: absolute; top: 0; left: 0; }
+#dc { cursor: crosshair; }
+#oc { pointer-events: none; }
+
+/* ── BAR SERIES PICKER STRIP ── */
 #bar-ser-picker {
   display: none;
-  background: #f4f6f9;
-  padding: 5px 8px;
-  gap: 5px;
+  background: #f1f5f9;
+  padding: 6px 10px;
+  gap: 6px;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  border: 1px solid #e4e8ef;
+  border: 1px solid var(--card-border);
   border-bottom: none;
+  border-radius: 8px 8px 0 0;
   flex-shrink: 0;
   box-sizing: border-box;
   width: 100%;
-  overflow: hidden;
 }
+
 #bar-ser-picker .bsp-label {
-  font-size: 10px; color: #6b7a90;
+  font-size: 8.5pt;
+  color: var(--card-header-title);
+  font-weight: 600;
   margin-right: 2px;
 }
+
 .bsp-btn {
-  display: flex; align-items: center; gap: 5px;
-  padding: 4px 11px; border-radius: 6px; cursor: pointer;
-  border: 2px solid transparent;
-  font-size: 11px; font-weight: 600;
-  background: #fff; transition: border-color 0.1s, box-shadow 0.1s;
-  color: #1e2a3a;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1.5px solid var(--card-border);
+  font-size: 8.5pt;
+  font-weight: 600;
+  background: #fff;
+  transition: all 0.12s;
+  color: var(--input-text);
 }
+
 .bsp-btn .bsp-swatch {
-  width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
   border: 1px solid rgba(0,0,0,0.15);
 }
+
 .bsp-btn.bsp-active {
-  border-color: #1e2a3a;
-  box-shadow: 0 1px 5px rgba(30,42,58,0.18);
-}
-.bsp-btn:not(.bsp-active) { opacity: 0.5; }
-.bsp-btn:hover:not(.bsp-active) { opacity: 0.8; }
-
-/* ── EXPORT ROW (CENTERED) ── */
-#export-row {
-  border-top: 1px solid #e4e8ef; background: #f4f6f9;
-  padding: 7px 12px; display: flex; flex-wrap: wrap; gap: 8px;
-  align-items: center; justify-content: center;
+  border-color: var(--btn-primary-bg);
+  background: #eef3fb;
+  color: #1e429f;
+  box-shadow: 0 1px 4px rgba(50, 102, 173, 0.18);
 }
 
-/* ── STATUS + VERSION ROW ── */
-#statusbar-row {
-  display: flex; align-items: center;
-  border-top: 1px solid #e4e8ef; background: #f4f6f9;
-  min-height: 20px;
-}
-#statusbar {
-  flex: 1; padding: 3px 10px;
-  font-size: 10px; color: #6b7a90;
-}
-#app-version {
-  font-size: 9px; color: #a0aab8;
-  white-space: nowrap; padding: 3px 8px;
-  border-left: 1px solid #e4e8ef;
-}
+.bsp-btn:not(.bsp-active) { opacity: 0.6; }
+.bsp-btn:hover:not(.bsp-active) { opacity: 0.9; }
 
 /* ── HTML LEGEND STRIP ── */
 #html-legend {
@@ -422,25 +673,55 @@ canvas { position: absolute; top: 0; left: 0; }
   gap: 6px 14px;
   align-items: center;
   justify-content: center;
-  padding: 5px 8px;
-  background: #f9fafc;
-  border: 1px solid #e4e8ef;
+  padding: 6px 10px;
+  background: #f8fafc;
+  border: 1px solid var(--card-border);
   border-bottom: none;
   flex-shrink: 0;
-  box-sizing: border-box;
   width: 100%;
-  overflow: hidden;
-}
-.hl-item {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 11px; color: #1e2a3a;
-}
-.hl-swatch {
-  width: 16px; height: 12px; border-radius: 3px; flex-shrink: 0;
-  border: 1px solid rgba(0,0,0,0.12);
 }
 
-#statusbar { border: none; background: transparent; }
+.hl-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 8.5pt;
+  font-weight: 600;
+  color: #334155;
+}
+
+.hl-swatch {
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+/* ── EXPORT TRAY ── */
+.export-tray {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.feedback-row {
+  min-height: 22px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-feedback {
+  font-size: 9.5pt;
+  color: var(--btn-green-bg);
+  font-weight: 600;
+  display: none;
+  align-items: center;
+  gap: 5px;
+}
 </style>
 </head>
 <body>
@@ -450,205 +731,277 @@ canvas { position: absolute; top: 0; left: 0; }
 <input type="file" id="file-loader" accept=".json" style="display:none;" onchange="handleFileLoad(event)">
 
 <!-- ══ HEADER ══ -->
-<div id="app-header">
-  <div>
-    <div id="app-title">A Humble Quick Plot</div>
-    <div id="app-subtitle">A Quick Graph Builder for Students — Created by Steven Humble</div>
+<header id="app-header">
+  <div class="header-titles">
+    <div id="app-title"><i class="ti ti-chart-dots"></i> A Humble Quick Plot</div>
+    <div id="app-subtitle">A Quick Graph Builder for Students &mdash; Built by Steven Humble</div>
   </div>
-  <div style="display:flex; gap:6px;">
-    <button class="tb" onclick="saveProject()" title="Save project to .json file">💾 Save</button>
-    <button class="tb" onclick="document.getElementById('file-loader').click()" title="Open existing .json project">📂 Open</button>
+  <div class="header-right">
+    <button class="btn btn-sm btn-header" onclick="saveProject()" title="Save project to .json file">
+      <i class="ti ti-device-floppy"></i> Save
+    </button>
+    <button class="btn btn-sm btn-header" onclick="document.getElementById('file-loader').click()" title="Open existing .json project">
+      <i class="ti ti-folder"></i> Open
+    </button>
+    <div class="toolbar-ver">V 1.1.0 &mdash; 2026-09-16</div>
   </div>
-</div>
+</header>
 
-<!-- ══ APP BODY ══ -->
-<div id="app-body">
+<!-- ══ MAIN BODY ══ -->
+<main class="content">
+  <div class="split-layout">
 
-  <!-- LEFT PANEL -->
-  <div id="left-panel">
+    <!-- LEFT CONTROLS PANEL -->
+    <aside class="split-left" id="controls-panel">
 
-  <!-- ══ TOOLBAR ══ -->
-  <div id="toolbar">
-
-    <!-- Row 1: Graph type buttons -->
-    <div class="tb-row">
-      <div class="tg">
-        <span class="tg-label">Type:</span>
-        <button class="tb" id="btn-bar"       onclick="setType('bar')">Bar</button>
-        <button class="tb" id="btn-line"      onclick="setType('line')">Line</button>
-        <button class="tb" id="btn-scatter"   onclick="setType('scatter')">Scatter</button>
-        <button class="tb" id="btn-histogram" onclick="setType('histogram')">Histogram</button>
-      </div>
-    </div>
-
-    <!-- Secondary tools -->
-    <div id="secondary-tools" class="controls-locked">
-      <!-- Row 2: Best Fit, Error, Minor Grid -->
-      <div class="tb-row" style="justify-content: center; margin-top: 5px;">
-        <div class="tg">
-          <button class="tb" id="btn-bf" onclick="toggleBestFit()" title="Toggle best-fit line & regression (scatter)">Best Fit (y=mx+b)</button>
-          <button class="tb" id="btn-eb" onclick="toggleErrorBars()" title="Toggle error bar entry mode">± Error</button>
-          <button class="tb" id="btn-mg" onclick="toggleMinorGrid()" title="Toggle minor gridlines">Minor Grid</button>
-        </div>
-      </div>
-
-      <!-- Row 3: + Series, Undo, Delete, Clear -->
-      <div class="tb-row" style="justify-content: center; margin-top: 5px;">
-        <div class="tg" id="tg-addseries">
-          <button class="tb" onclick="addSeries()">+ Series</button>
-        </div>
-        <div class="tg" style="border-left:none; padding-left:3px; margin-left:0;">
-          <button class="tb" onclick="undoLast()">↩ Undo</button>
-          <button class="tb" id="btn-delete" onclick="toggleDeleteMode()" title="Toggle delete mode">🗑</button>
-          <button class="tb red" onclick="clearAll()">✕ Clear</button>
-        </div>
-      </div>
-
-      <!-- Row 4: Graph Title -->
-      <div class="row" style="margin-top: 6px; margin-bottom: 2px;">
-        <label style="width: 70px;">Graph Title:</label>
-        <input type="text" id="inp-title" oninput="redraw()">
-      </div>
-    </div>
-
-  </div><!-- #toolbar -->
-
-    <!-- ══ MAIN CONFIG WRAPPER ══ -->
-    <div id="main-config" class="controls-locked">
-
-      <!-- ══ SYMBOLS & AXIS LABELS ══ -->
-      <div class="section">
-        
-        <!-- Symbol & Super/Subscript Action Bar -->
-        <div class="symbol-bar">
-          <select onchange="insertSymbol(this.value); this.selectedIndex=0;" title="Insert symbol at cursor">
-            <option value="" disabled selected>Symbols…</option>
-            <option value="±">± (Plus-Minus)</option>
-            <option value="°">° (Degree)</option>
-            <option value="μ">μ (Micro)</option>
-            <option value="Δ">Δ (Delta)</option>
-            <option value="Ψ">Ψ (Psi)</option>
-            <option value="α">α (Alpha)</option>
-            <option value="β">β (Beta)</option>
-            <option value="Φ">Φ (Phi)</option>
-          </select>
-          <button type="button" class="fmt-btn" onmousedown="event.preventDefault(); applyFormatting('super');" title="Convert highlighted text to Superscript">X²</button>
-          <button type="button" class="fmt-btn" onmousedown="event.preventDefault(); applyFormatting('sub');" title="Convert highlighted text to Subscript">X₂</button>
-        </div>
-
-        <div class="row">
-          <label>X-Axis Label:</label>
-          <input type="text" id="inp-xlabel" oninput="onXLabelChange()">
-        </div>
-        <div class="row" id="xscale-row" style="display:none; flex-wrap:nowrap; justify-content:center;">
-          <span class="mini-label" id="xscale-lbl">Min:</span>
-          <input type="number" id="inp-xmin" value="0" oninput="redraw()" style="width:50px">
-          <span class="mini-label" id="xmax-lbl">Max:</span>
-          <input type="number" id="inp-xmax" value="10" oninput="redraw()" style="width:50px">
-          <span class="mini-label" id="xstep-lbl">Step:</span>
-          <input type="number" id="inp-xstep" value="" oninput="redraw()" style="width:50px">
-        </div>
-        <hr style="border:none; border-top:1px dotted #c8d0dc; margin:5px 0;">
-        <div class="row">
-          <label>Y-Axis Label:</label>
-          <input type="text" id="inp-ylabel" oninput="redraw()">
-        </div>
-        <div class="row" style="flex-wrap:nowrap; justify-content:center;">
-          <span class="mini-label">Min:</span>
-          <input type="number" id="inp-ymin" value="-10" oninput="redraw()" style="width:50px">
-          <span class="mini-label">Max:</span>
-          <input type="number" id="inp-ymax" value="10" oninput="redraw()" style="width:50px">
-          <span class="mini-label">Step:</span>
-          <input type="number" id="inp-ystep" value="1" oninput="redraw()" style="width:50px">
-        </div>
-      </div>
-
-      <!-- ══ CATEGORY EDITOR ══ -->
-      <div class="section" id="cat-section">
-        <div class="row" style="margin-bottom:0">
-          <label>X Categories:</label>
-          <span style="font-size:10px;color:#999;">Add a label for each bar</span>
-        </div>
-        <div id="cat-list"></div>
-        <div id="cat-input-wrap">
-          <input type="text" id="cat-input"
-            oninput="hideCategoryArrow()"
-            onkeydown="if(event.key==='Enter')addCategory()">
-          <button onclick="addCategory()">+ Add</button>
-        </div>
-        <div id="cat-arrow-hint">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d55e00" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="19" x2="12" y2="5"></line>
-            <polyline points="5 12 12 5 19 12"></polyline>
-          </svg>
-          <span>Add category name here first</span>
-        </div>
-      </div>
-
-      <!-- ══ LEGEND / GROUPS EDITOR ══ -->
-      <div class="section" id="leg-section">
-        <div id="leg-normal">
-          <div class="leg-hdr">
-            <span id="leg-title">Legend / Series</span>
-            <button class="tb" onclick="addSeries()">+ Add Series</button>
+      <!-- CARD 1: GRAPH TYPE -->
+      <div class="opt-group">
+        <div class="opt-group-header">
+          <div class="opt-group-header-left">
+            <i class="ti ti-category"></i>
+            <span class="opt-group-title">Graph Type</span>
           </div>
-          <div id="leg-list"></div>
         </div>
-        <div id="leg-hist" style="display:none">
-          <div class="row">
-            <label>Bar Color:</label>
-            <div id="hist-color-wrap"></div>
+        <div class="opt-group-body">
+          <div class="action-grid">
+            <button class="act-btn" id="btn-bar" onclick="setType('bar')">
+              <i class="ti ti-chart-bar"></i> Bar
+            </button>
+            <button class="act-btn" id="btn-line" onclick="setType('line')">
+              <i class="ti ti-chart-line"></i> Line
+            </button>
+            <button class="act-btn" id="btn-scatter" onclick="setType('scatter')">
+              <i class="ti ti-chart-dots"></i> Scatter
+            </button>
+            <button class="act-btn" id="btn-histogram" onclick="setType('histogram')">
+              <i class="ti ti-chart-histogram"></i> Hist
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- ══ HISTOGRAM CONFIG ══ -->
-      <div class="section" id="hist-section" style="display:none">
-        <div class="row" style="flex-wrap:nowrap; justify-content:center;">
-          <span class="mini-label">Bin Start:</span>
-          <input type="number" id="inp-binstart" value="0" oninput="redraw()" style="width:50px">
-          <span class="mini-label">Width:</span>
-          <input type="number" id="inp-binwidth" value="1" min="0.01" oninput="redraw()" style="width:50px">
-          <span class="mini-label"># Bins:</span>
-          <input type="number" id="inp-bincount" value="5" min="1" max="20" oninput="redraw()" style="width:50px">
+      <!-- CARD 2: TOOLS & MODIFIERS -->
+      <div class="opt-group controls-locked" id="card-tools">
+        <div class="opt-group-header">
+          <div class="opt-group-header-left">
+            <i class="ti ti-tools"></i>
+            <span class="opt-group-title">Tools & Modifiers</span>
+          </div>
         </div>
-        <div id="hist-hint" style="font-size:10px;color:#d55e00;margin-top:3px;display:none">
-          Set bin parameters above, then click each bin to enter its frequency
+        <div class="opt-group-body">
+          <div class="btn-row" style="margin-top:0; margin-bottom:8px;">
+            <button class="btn btn-secondary btn-sm" id="btn-bf" onclick="toggleBestFit()" title="Toggle best-fit line & regression (scatter)">
+              <i class="ti ti-math-function"></i> Best Fit
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-eb" onclick="toggleErrorBars()" title="Toggle error bar entry mode">
+              <i class="ti ti-plus-minus"></i> ± Error
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-mg" onclick="toggleMinorGrid()" title="Toggle minor gridlines">
+              <i class="ti ti-grid-dots"></i> Minor Grid
+            </button>
+          </div>
+
+          <div class="btn-row" style="margin-top:0;">
+            <button class="btn btn-secondary btn-sm" onclick="undoLast()">
+              <i class="ti ti-arrow-back-up"></i> Undo
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-delete" onclick="toggleDeleteMode()" title="Toggle delete point mode">
+              <i class="ti ti-trash"></i> Delete
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="clearAll()">
+              <i class="ti ti-x"></i> Clear
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- ══ EXPORT ══ -->
-      <div id="export-row">
-        <button class="tb" onclick="downloadPNG()">⬇ PNG</button>
-        <button class="tb green" onclick="copyPNG()" id="btn-copy">📋 Copy Image</button>
+      <!-- CARD 3: GRAPH TITLES & AXES -->
+      <div class="opt-group controls-locked" id="card-axes">
+        <div class="opt-group-header">
+          <div class="opt-group-header-left">
+            <i class="ti ti-typography"></i>
+            <span class="opt-group-title">Labels & Scales</span>
+          </div>
+        </div>
+        <div class="opt-group-body">
+          <div class="symbol-bar">
+            <select onchange="insertSymbol(this.value); this.selectedIndex=0;" title="Insert symbol at cursor" style="width:auto; flex:1; padding:4px 6px;">
+              <option value="" disabled selected>Symbols…</option>
+              <option value="±">± (Plus-Minus)</option>
+              <option value="°">° (Degree)</option>
+              <option value="μ">μ (Micro)</option>
+              <option value="Δ">Δ (Delta)</option>
+              <option value="Ψ">Ψ (Psi)</option>
+              <option value="α">α (Alpha)</option>
+              <option value="β">β (Beta)</option>
+              <option value="Φ">Φ (Phi)</option>
+              <option value="×">× (Multiply)</option>
+            </select>
+            <button type="button" class="fmt-btn" onmousedown="event.preventDefault(); applyFormatting('super');" title="Convert highlighted text to Superscript">X²</button>
+            <button type="button" class="fmt-btn" onmousedown="event.preventDefault(); applyFormatting('sub');" title="Convert highlighted text to Subscript">X₂</button>
+          </div>
+
+          <div class="field-row">
+            <label for="inp-title">Graph Title:</label>
+            <input type="text" id="inp-title" oninput="redraw()" placeholder="Graph Title">
+          </div>
+
+          <div class="field-row">
+            <label for="inp-xlabel">X-Axis Label:</label>
+            <input type="text" id="inp-xlabel" oninput="onXLabelChange()" placeholder="X-Axis Label">
+          </div>
+
+          <div id="xscale-row" class="grid-3" style="display:none; margin-bottom:10px;">
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">X Min</label>
+              <input type="number" id="inp-xmin" value="0" oninput="redraw()">
+            </div>
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">X Max</label>
+              <input type="number" id="inp-xmax" value="10" oninput="redraw()">
+            </div>
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">X Step</label>
+              <input type="number" id="inp-xstep" value="" oninput="redraw()">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <label for="inp-ylabel">Y-Axis Label:</label>
+            <input type="text" id="inp-ylabel" oninput="redraw()" placeholder="Y-Axis Label">
+          </div>
+
+          <div class="grid-3">
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Y Min</label>
+              <input type="number" id="inp-ymin" value="-10" oninput="redraw()">
+            </div>
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Y Max</label>
+              <input type="number" id="inp-ymax" value="10" oninput="redraw()">
+            </div>
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Y Step</label>
+              <input type="number" id="inp-ystep" value="1" oninput="redraw()">
+            </div>
+          </div>
+        </div>
       </div>
 
-    </div><!-- #main-config -->
-
-    <!-- ══ STATUS + VERSION ══ -->
-    <div id="statusbar-row">
-      <div id="statusbar"></div>
-      <div id="app-version">v1.6.0 &nbsp;·&nbsp; 08-20-2026</div>
-    </div>
-
-  </div><!-- #left-panel -->
-
-  <!-- RIGHT: series picker + legend + graph canvas -->
-  <div id="right-canvas">
-    <div id="graph-stack">
-      <div id="bar-ser-picker">
-        <span class="bsp-label">Drawing on:</span>
+      <!-- CARD 4: CATEGORY EDITOR (BAR GRAPH ONLY) -->
+      <div class="opt-group" id="cat-section" style="display:none;">
+        <div class="opt-group-header">
+          <div class="opt-group-header-left">
+            <i class="ti ti-layout-navbar"></i>
+            <span class="opt-group-title">X Categories</span>
+          </div>
+        </div>
+        <div class="opt-group-body">
+          <div id="cat-list"></div>
+          <div id="cat-input-wrap">
+            <input type="text" id="cat-input" placeholder="Category name..."
+              oninput="hideCategoryArrow()"
+              onkeydown="if(event.key==='Enter')addCategory()">
+            <button class="btn btn-secondary btn-sm" onclick="addCategory()">
+              <i class="ti ti-plus"></i> Add
+            </button>
+          </div>
+          <div id="cat-arrow-hint">
+            <i class="ti ti-arrow-up"></i>
+            <span>Add category name here first</span>
+          </div>
+        </div>
       </div>
-      <div id="html-legend"></div>
-      <div id="graph-wrap">
-        <canvas id="gc"></canvas>
-        <canvas id="dc"></canvas>
-        <canvas id="oc"></canvas>
+
+      <!-- CARD 5: HISTOGRAM CONFIG -->
+      <div class="opt-group" id="hist-section" style="display:none;">
+        <div class="opt-group-header">
+          <div class="opt-group-header-left">
+            <i class="ti ti-chart-histogram"></i>
+            <span class="opt-group-title">Histogram Bins</span>
+          </div>
+        </div>
+        <div class="opt-group-body">
+          <div class="grid-3">
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Bin Start</label>
+              <input type="number" id="inp-binstart" value="0" oninput="redraw()">
+            </div>
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Width</label>
+              <input type="number" id="inp-binwidth" value="1" min="0.01" oninput="redraw()">
+            </div>
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;"># Bins</label>
+              <input type="number" id="inp-bincount" value="5" min="1" max="20" oninput="redraw()">
+            </div>
+          </div>
+          <div id="hist-hint" style="font-size:8.5pt; color:#d55e00; margin-top:8px; display:none;">
+            <i class="ti ti-info-circle"></i> Set bin parameters above, then click each bin to plot frequency.
+          </div>
+        </div>
       </div>
-    </div>
+
+      <!-- CARD 6: LEGEND & SERIES -->
+      <div class="opt-group controls-locked" id="leg-section">
+        <div class="opt-group-header">
+          <div class="opt-group-header-left">
+            <i class="ti ti-palette"></i>
+            <span class="opt-group-title" id="leg-title">Legend / Series</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-addseries" onclick="addSeries()">
+            <i class="ti ti-plus"></i> Add Series
+          </button>
+        </div>
+        <div class="opt-group-body">
+          <div id="leg-normal">
+            <div id="leg-list"></div>
+          </div>
+          <div id="leg-hist" style="display:none;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <label style="font-size:9.5pt; font-weight:600; color:var(--input-label);">Bar Color:</label>
+              <div id="hist-color-wrap"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT STAGE PANEL -->
+    <section class="split-right" id="stage-panel">
+      <div id="graph-stack">
+        <div id="bar-ser-picker">
+          <span class="bsp-label">Drawing on:</span>
+        </div>
+        <div id="html-legend"></div>
+        <div class="canvas-wrapper" id="graph-wrap">
+          <canvas id="gc"></canvas>
+          <canvas id="dc"></canvas>
+          <canvas id="oc"></canvas>
+        </div>
+      </div>
+
+      <!-- EXPORT CONTROLS TRAY -->
+      <div class="export-tray">
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="downloadPNG()">
+            <i class="ti ti-download"></i> Download PNG
+          </button>
+          <button class="btn btn-green" id="copyBtn" onclick="copyPNG()">
+            <i class="ti ti-copy"></i> Copy to Clipboard
+          </button>
+        </div>
+        <div class="feedback-row">
+          <span class="copy-feedback" id="copyFeedback">
+            <i class="ti ti-check"></i> Copied to clipboard!
+          </span>
+        </div>
+      </div>
+    </section>
+
   </div>
-
-</div>
+</main>
 
 </div>
 
@@ -702,7 +1055,6 @@ const SUB_MAP = {
   'v':'ᵥ', 'x':'ₓ'
 };
 
-// Inverse maps to toggle back if already formatted
 const INV_SUPER = Object.fromEntries(Object.entries(SUPER_MAP).map(([k, v]) => [v, k]));
 const INV_SUB   = Object.fromEntries(Object.entries(SUB_MAP).map(([k, v]) => [v, k]));
 
@@ -760,26 +1112,23 @@ function applyFormatting(type){
   el.dispatchEvent(new Event('input'));
 }
 
-// canvases
+// Canvases
 const gc = document.getElementById('gc'), gctx = gc.getContext('2d');
 const dc = document.getElementById('dc'), dctx = dc.getContext('2d');
 const oc = document.getElementById('oc'), octx = oc.getContext('2d');
 
 function resizeCanvases(){
-  const header  = document.getElementById('app-header');
-  const leftPan = document.getElementById('left-panel');
+  const stage   = document.getElementById('stage-panel');
   const stack   = document.getElementById('graph-stack');
+  const tray    = document.querySelector('.export-tray');
 
-  const leftW = leftPan.offsetWidth || 300;
-  const headH = header.offsetHeight || 50;
-  const pad   = 24;
-
+  const availW = (stage.clientWidth || 600) - 36;
   const isHist = graphType === 'histogram';
-  const stripH = isHist ? 0 : 84;
+  const stripH = isHist ? 0 : 40;
+  const trayH  = tray ? tray.offsetHeight + 18 : 60;
+  const availH = (stage.clientHeight || 600) - stripH - trayH - 36;
 
-  const availW = window.innerWidth  - leftW - pad;
-  const availH = window.innerHeight - headH - stripH - pad;
-  const size   = Math.max(100, Math.min(availW, availH));
+  const size = Math.max(160, Math.floor(Math.min(availW, availH)));
 
   stack.style.width = size + 'px';
 
@@ -816,8 +1165,6 @@ function px2y(p){ return yMin() + (1 - (p - M.top)  / pH()) * (yMax() - yMin());
 function inPlot(px,py){
   return px>=M.left && px<=M.left+pW() && py>=M.top && py<=M.top+pH();
 }
-
-function status(msg){ /* intentional */ }
 
 function xStep(){
   const v = parseFloat(document.getElementById('inp-xstep').value);
@@ -896,8 +1243,8 @@ function drawGrid(){
     const cy = M.top  + pH()/2;
     gctx.save();
     gctx.globalAlpha = 0.65;
-    gctx.fillStyle   = '#1d5fc4';
-    gctx.font        = `bold ${fsp + 1}px Arial`;
+    gctx.fillStyle   = '#3266ad';
+    gctx.font        = `bold ${fsp + 1}px system-ui, Arial`;
     gctx.textAlign   = 'center';
     gctx.fillText('Select Graph Type to Begin', cx, cy);
     gctx.restore();
@@ -906,12 +1253,10 @@ function drawGrid(){
 
   syncHistXScale();
 
-  // ── MINOR GRIDLINES (1/4, 1/2, 3/4) ──
   if(showMinorGrid){
     gctx.strokeStyle = '#ebeef5';
     gctx.lineWidth   = 0.5;
 
-    // Minor Y
     const yEff = getEffectiveStep(yMin(), yMax(), yStep());
     if(yEff){
       minorSteps(yMin(), yMax(), yEff).forEach(v => {
@@ -921,7 +1266,6 @@ function drawGrid(){
       });
     }
 
-    // Minor X (Line & Scatter)
     if(graphType !== 'bar' && graphType !== 'histogram'){
       const xEff = getEffectiveStep(xMin(), xMax(), xStep());
       if(xEff){
@@ -970,7 +1314,7 @@ function drawGrid(){
       gctx.textAlign   = 'center';
       gctx.fillText('Add an X Category to Start', cx, cy - Math.round(fsp*0.8));
       gctx.font        = `${Math.round(fsp*0.85)}px 'Arial Narrow', Arial, sans-serif`;
-      gctx.fillText('Type a name → click  + Add', cx, cy + Math.round(fsp*0.9));
+      gctx.fillText('Type a name → click + Add', cx, cy + Math.round(fsp*0.9));
       gctx.restore();
       updateCatHint(true);
     }
@@ -1052,13 +1396,14 @@ function drawGrid(){
 }
 
 // ════════════════════════════════════════════════
-//  BAR LAYOUT HELPERS
+//  BAR GEOMETRY
 // ════════════════════════════════════════════════
 function catCenterX(catIdx){
   const n = categories.length||1;
   const slot = pW()/n;
   return M.left + slot*catIdx + slot/2;
 }
+
 function barGeom(catIdx, serIdx){
   const nSer = series.length;
   const n    = categories.length||1;
@@ -1321,7 +1666,7 @@ function renderHtmlLegend(){
 function redraw(){ drawGrid(); drawData(); drawOverlay(); renderHtmlLegend(); }
 
 // ════════════════════════════════════════════════
-//  MOUSE / TOUCH
+//  MOUSE / TOUCH INTERACTIONS
 // ════════════════════════════════════════════════
 let dragging = false;
 let errDrag  = null;
@@ -1375,7 +1720,7 @@ dc.addEventListener('mousemove', e => {
   }
 
   if(inPlot(px, py)){
-    dc.style.cursor = errorMode ? 'cell' : 'crosshair';
+    dc.style.cursor = errorMode ? 'cell' : (deleteMode ? 'not-allowed' : 'crosshair');
     if(dragging && !errorMode && graphType !== 'bar') handlePlotClick(px, py);
     if(dragging && graphType === 'histogram') handlePlotClick(px, py);
   } else {
@@ -1425,8 +1770,7 @@ function handlePlotClick(px, py){
     else series[activeSer].points.push({ cat: ci, y: ySnap, err: 0 });
   } else if(graphType === 'histogram'){
     const start = histBinStart(), bw = histBinWidth(), n = histBinCount();
-    const dataX = xv;
-    const binIdx = Math.floor((dataX - start) / bw);
+    const binIdx = Math.floor((px2x(px) - start) / bw);
     if(binIdx < 0 || binIdx >= n) return;
     const ySnap = parseFloat(yv.toFixed(3));
     const existing = series[0].points.findIndex(p => p.binIdx === binIdx);
@@ -1441,7 +1785,7 @@ function handlePlotClick(px, py){
 }
 
 // ════════════════════════════════════════════════
-//  CATEGORY MANAGEMENT & ARROW LOGIC
+//  CATEGORY MANAGEMENT
 // ════════════════════════════════════════════════
 let arrowTimeout = null;
 
@@ -1506,7 +1850,7 @@ function renderCatList(){
   categories.forEach((c,i)=>{
     const tag = document.createElement('div');
     tag.className='cat-tag';
-    tag.innerHTML=`${c}<button onclick="removeCategory(${i})">×</button>`;
+    tag.innerHTML=`${c}<button onclick="removeCategory(${i})">&times;</button>`;
     el.appendChild(tag);
   });
 }
@@ -1536,7 +1880,7 @@ function createColorSelect(currentColor, onChangeCallback){
   trigger.type = 'button';
   trigger.className = 'color-trigger';
   trigger.style.backgroundColor = currentColor;
-  trigger.title = 'Change color';
+  trigger.title = 'Choose color';
 
   const arrow = document.createElement('span');
   arrow.className = 'arrow';
@@ -1673,8 +2017,8 @@ function renderLegList(focusIndex = -1){
     };
 
     const delBtn = document.createElement('button');
-    delBtn.className = 'del-btn';
-    delBtn.textContent = '✕';
+    delBtn.className = 'btn btn-danger btn-sm del-btn';
+    delBtn.innerHTML = '<i class="ti ti-x"></i>';
     delBtn.onclick = () => removeSeries(i);
 
     row.appendChild(colorSelect);
@@ -1717,12 +2061,13 @@ function setScaleDefaults(type){
 function setType(t){
   graphType = t;
 
-  document.getElementById('secondary-tools').classList.remove('controls-locked');
-  document.getElementById('main-config').classList.remove('controls-locked');
+  document.getElementById('card-tools').classList.remove('controls-locked');
+  document.getElementById('card-axes').classList.remove('controls-locked');
+  document.getElementById('leg-section').classList.remove('controls-locked');
 
   ['bar','line','scatter','histogram'].forEach(g => {
     const btn = document.getElementById('btn-'+g);
-    if(btn) btn.classList.toggle('active', g===t);
+    if(btn) btn.classList.toggle('active-mode', g===t);
   });
 
   const isCat  = (t === 'bar');
@@ -1730,7 +2075,7 @@ function setType(t){
 
   const legTitle = document.getElementById('leg-title');
   if(legTitle){
-    legTitle.textContent = isCat ? 'Groups within X-Categories' : 'Legend / Series';
+    legTitle.textContent = isCat ? 'Groups within Categories' : 'Legend / Series';
   }
 
   document.getElementById('cat-section').style.display  = isCat  ? 'block' : 'none';
@@ -1740,17 +2085,16 @@ function setType(t){
   document.getElementById('leg-normal').style.display   = isHist ? 'none' : 'block';
   document.getElementById('leg-hist').style.display     = isHist ? 'block' : 'none';
   if(isHist) renderHistColorPicker();
-  document.getElementById('tg-addseries').style.display = isHist ? 'none' : '';
+  document.getElementById('btn-addseries').style.display = isHist ? 'none' : '';
 
   const showXScale = (!isCat && !isHist);
   const xrow = document.getElementById('xscale-row');
-  xrow.style.display    = showXScale ? 'flex' : 'none';
-  xrow.style.flexWrap   = 'nowrap';
+  xrow.style.display = showXScale ? 'grid' : 'none';
 
   document.getElementById('bar-ser-picker').style.display = isHist ? 'none' : 'flex';
   document.getElementById('btn-bf').style.opacity = t === 'scatter' ? '1' : '0.4';
   document.getElementById('btn-eb').style.opacity = isHist ? '0.4' : '1';
-  if(isHist && errorMode){ errorMode = false; document.getElementById('btn-eb').classList.remove('active'); }
+  if(isHist && errorMode){ errorMode = false; document.getElementById('btn-eb').classList.remove('active-mode'); }
 
   if(isHist){
     series = [{ label: series[0].label, color: series[0].color, points: [], errors: [] }];
@@ -1772,26 +2116,26 @@ function setType(t){
 function toggleBestFit(){
   if(graphType!=='scatter') return;
   showBestFit=!showBestFit;
-  document.getElementById('btn-bf').classList.toggle('active',showBestFit);
+  document.getElementById('btn-bf').classList.toggle('active-mode', showBestFit);
   redraw();
 }
 
 function toggleMinorGrid(){
   showMinorGrid = !showMinorGrid;
-  document.getElementById('btn-mg').classList.toggle('active', showMinorGrid);
+  document.getElementById('btn-mg').classList.toggle('active-mode', showMinorGrid);
   redraw();
 }
 
 function toggleDeleteMode(){
   deleteMode = !deleteMode;
-  if(deleteMode && errorMode){ errorMode = false; document.getElementById('btn-eb').classList.remove('active'); }
-  document.getElementById('btn-delete').classList.toggle('active', deleteMode);
+  if(deleteMode && errorMode){ errorMode = false; document.getElementById('btn-eb').classList.remove('active-mode'); }
+  document.getElementById('btn-delete').classList.toggle('active-mode', deleteMode);
   dc.style.cursor = deleteMode ? 'not-allowed' : 'crosshair';
 }
 
 function toggleErrorBars(){
   errorMode=!errorMode;
-  document.getElementById('btn-eb').classList.toggle('active',errorMode);
+  document.getElementById('btn-eb').classList.toggle('active-mode', errorMode);
 }
 
 function deleteNearest(px, py){
@@ -1808,8 +2152,7 @@ function deleteNearest(px, py){
     }
   } else if(graphType === 'histogram'){
     const start = histBinStart(), bw = histBinWidth(), n = histBinCount();
-    const xv = px2x(px);
-    const binIdx = Math.floor((xv - start) / bw);
+    const binIdx = Math.floor((px2x(px) - start) / bw);
     if(binIdx < 0 || binIdx >= n) return;
     const idx = series[0].points.findIndex(p => p.binIdx === binIdx);
     if(idx !== -1){
@@ -1847,9 +2190,15 @@ function clearAll(){
 // ════════════════════════════════════════════════
 //  SAVE & LOAD PROJECT (.json)
 // ════════════════════════════════════════════════
+function getTimestamp(){
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
+
 function saveProject(){
   const projectData = {
-    version: '1.6.0',
+    version: '1.1.0',
     graphType,
     title: document.getElementById('inp-title').value,
     xlabel: document.getElementById('inp-xlabel').value,
@@ -1871,9 +2220,7 @@ function saveProject(){
 
   const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
-  const now = new Date();
-  const stamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-  a.download = `QuickPlot_Project_${stamp}.json`;
+  a.download = `QuickPlot_Project_${getTimestamp()}.json`;
   a.href = URL.createObjectURL(blob);
   a.click();
 }
@@ -1911,10 +2258,10 @@ function handleFileLoad(event){
       series = data.series || [];
 
       showBestFit = !!data.showBestFit;
-      document.getElementById('btn-bf').classList.toggle('active', showBestFit);
+      document.getElementById('btn-bf').classList.toggle('active-mode', showBestFit);
 
       showMinorGrid = !!data.showMinorGrid;
-      document.getElementById('btn-mg').classList.toggle('active', showMinorGrid);
+      document.getElementById('btn-mg').classList.toggle('active-mode', showMinorGrid);
 
       renderCatList();
       renderSerSelect();
@@ -1929,14 +2276,14 @@ function handleFileLoad(event){
 }
 
 // ════════════════════════════════════════════════
-//  EXPORT COMPOSITION
+//  EXPORT COMPOSITION & CLIPBOARD
 // ════════════════════════════════════════════════
-const EXPORT_SIZE = 500;
+const EXPORT_SIZE = 600;
 
 function compositeCanvas(){
   const legendEl = document.getElementById('html-legend');
   const showLeg  = legendEl.style.display !== 'none' && legendEl.children.length > 0;
-  const legH     = showLeg ? 26 : 0;
+  const legH     = showLeg ? 28 : 0;
   const EX = EXPORT_SIZE;
 
   const savedW = W, savedH = H;
@@ -1950,9 +2297,9 @@ function compositeCanvas(){
   t.fillStyle = '#fff'; t.fillRect(0, 0, EX, EX + legH);
 
   if(showLeg){
-    t.fillStyle = '#f9fafc';
+    t.fillStyle = '#f8fafc';
     t.fillRect(0, 0, EX, legH);
-    t.strokeStyle = '#e4e8ef'; t.lineWidth = 1;
+    t.strokeStyle = '#cbd5e1'; t.lineWidth = 1;
     t.beginPath(); t.moveTo(0, legH); t.lineTo(EX, legH); t.stroke();
     const items = [...legendEl.querySelectorAll('.hl-item')];
     const totalW = items.reduce((sum, item) => {
@@ -1987,14 +2334,11 @@ function compositeCanvas(){
   return tmp;
 }
 
-async function downloadPNG(){
+function downloadPNG(){
   if(!graphType) return;
   const tmp = compositeCanvas();
-  const now = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  const stamp = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
   const a = document.createElement('a');
-  a.download = `Graph_${stamp}.png`;
+  a.download = `QuickPlot_${getTimestamp()}.png`;
   a.href = tmp.toDataURL('image/png');
   a.click();
 }
@@ -2002,18 +2346,34 @@ async function downloadPNG(){
 async function copyPNG(){
   if(!graphType) return;
   const tmp = compositeCanvas();
-  tmp.toBlob(async blob=>{
-    try{
-      await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-    } catch(err){
-      const url=URL.createObjectURL(blob);
-      window.open(url,'_blank');
+  const btn = document.getElementById('copyBtn');
+  const fb  = document.getElementById('copyFeedback');
+
+  try {
+    const blob = await new Promise((resolve, reject) => {
+      tmp.toBlob(b => b ? resolve(b) : reject(new Error('Canvas blob failed')), 'image/png');
+    });
+
+    if(navigator.clipboard && window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      fb.style.display = 'inline-flex';
+      const origBg = btn.style.background;
+      btn.style.background = '#145e2c';
+
+      setTimeout(() => {
+        fb.style.display = 'none';
+        btn.style.background = origBg || 'var(--btn-green-bg)';
+      }, 2500);
+      return;
     }
-  },'image/png');
+    throw new Error('Clipboard API unavailable');
+  } catch(err) {
+    downloadPNG();
+  }
 }
 
 // ════════════════════════════════════════════════
-//  INIT
+//  INITIALIZATION
 // ════════════════════════════════════════════════
 renderSerSelect();
 renderLegList();
