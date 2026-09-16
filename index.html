@@ -100,7 +100,7 @@ html, body {
   font-weight: bold;
   color: var(--header-title);
   letter-spacing: 0.01em;
-  line-height: 1.2;
+  line-height: 1;
   white-space: nowrap;
   display: flex;
   align-items: center;
@@ -117,7 +117,7 @@ html, body {
   color: var(--header-sub);
   font-style: italic;
   white-space: nowrap;
-  line-height: 1.2;
+  line-height: 1;
 }
 
 .header-right {
@@ -215,6 +215,15 @@ html, body {
   padding: 12px;
 }
 
+.card-desc {
+  font-size: 8pt;
+  color: #64748b;
+  font-style: italic;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  display: block;
+}
+
 /* ── FORM ELEMENTS ── */
 input[type=text],
 input[type=number],
@@ -274,11 +283,12 @@ input[type=number]::-webkit-inner-spin-button {
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 
-/* ── BUTTONS ── */
+/* ── BUTTONS & CENTERING ── */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
   gap: 5px;
   border-radius: 6px;
   padding: 6px 12px;
@@ -290,7 +300,7 @@ input[type=number]::-webkit-inner-spin-button {
   border: none;
   white-space: nowrap;
   background: transparent;
-  line-height: 1.3;
+  line-height: 1;
 }
 
 .btn:disabled {
@@ -327,7 +337,7 @@ input[type=number]::-webkit-inner-spin-button {
 }
 
 .btn-sm {
-  padding: 4px 8px;
+  padding: 5px 9px;
   font-size: 8.5pt;
 }
 
@@ -346,16 +356,16 @@ input[type=number]::-webkit-inner-spin-button {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 
 .act-btn {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 8px 4px;
+  text-align: center;
+  height: 34px;
+  padding: 0 4px;
   background: #f8fafc;
   border: 1.5px solid var(--card-border);
   border-radius: 6px;
@@ -365,7 +375,8 @@ input[type=number]::-webkit-inner-spin-button {
   font-weight: 600;
   color: #334155;
   transition: all .12s;
-  text-align: center;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .act-btn:hover:not(:disabled) {
@@ -379,10 +390,6 @@ input[type=number]::-webkit-inner-spin-button {
   border-color: var(--btn-primary-bg);
   color: #1e429f;
   box-shadow: 0 0 0 2px var(--input-focus-ring);
-}
-
-.act-btn i {
-  font-size: 18px;
 }
 
 /* ── CONTROLS LOCK ── */
@@ -417,7 +424,7 @@ input[type=number]::-webkit-inner-spin-button {
   border-radius: 6px;
   cursor: pointer;
   color: #1e2a3a;
-  line-height: 1.2;
+  line-height: 1;
 }
 .fmt-btn:hover { background: #e2e8f0; }
 
@@ -637,6 +644,7 @@ canvas { position: absolute; top: 0; left: 0; }
 .bsp-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   padding: 4px 10px;
   border-radius: 6px;
@@ -647,6 +655,7 @@ canvas { position: absolute; top: 0; left: 0; }
   background: #fff;
   transition: all 0.12s;
   color: var(--input-text);
+  line-height: 1;
 }
 
 .bsp-btn .bsp-swatch {
@@ -688,6 +697,7 @@ canvas { position: absolute; top: 0; left: 0; }
   font-size: 8.5pt;
   font-weight: 600;
   color: #334155;
+  line-height: 1;
 }
 
 .hl-swatch {
@@ -733,17 +743,14 @@ canvas { position: absolute; top: 0; left: 0; }
 <!-- ══ HEADER ══ -->
 <header id="app-header">
   <div class="header-titles">
-    <div id="app-title"><i class="ti ti-chart-dots"></i> A Humble Quick Plot</div>
+    <div id="app-title">A Humble Quick Plot</div>
     <div id="app-subtitle">A Quick Graph Builder for Students &mdash; Built by Steven Humble</div>
   </div>
   <div class="header-right">
-    <button class="btn btn-sm btn-header" onclick="saveProject()" title="Save project to .json file">
-      <i class="ti ti-device-floppy"></i> Save
-    </button>
-    <button class="btn btn-sm btn-header" onclick="document.getElementById('file-loader').click()" title="Open existing .json project">
-      <i class="ti ti-folder"></i> Open
-    </button>
-    <div class="toolbar-ver">V 1.1.0 &mdash; 2026-09-16</div>
+    <button class="btn btn-sm btn-header" onclick="resetApp()" title="Reset graph and start fresh">New</button>
+    <button class="btn btn-sm btn-header" onclick="saveProject()" title="Save project to .json file">Save</button>
+    <button class="btn btn-sm btn-header" onclick="document.getElementById('file-loader').click()" title="Open existing .json project">Open</button>
+    <div class="toolbar-ver">V 1.2.0 &mdash; 2026-09-16</div>
   </div>
 </header>
 
@@ -764,18 +771,10 @@ canvas { position: absolute; top: 0; left: 0; }
         </div>
         <div class="opt-group-body">
           <div class="action-grid">
-            <button class="act-btn" id="btn-bar" onclick="setType('bar')">
-              <i class="ti ti-chart-bar"></i> Bar
-            </button>
-            <button class="act-btn" id="btn-line" onclick="setType('line')">
-              <i class="ti ti-chart-line"></i> Line
-            </button>
-            <button class="act-btn" id="btn-scatter" onclick="setType('scatter')">
-              <i class="ti ti-chart-dots"></i> Scatter
-            </button>
-            <button class="act-btn" id="btn-histogram" onclick="setType('histogram')">
-              <i class="ti ti-chart-histogram"></i> Hist
-            </button>
+            <button class="act-btn" id="btn-bar" onclick="setType('bar')">Bar</button>
+            <button class="act-btn" id="btn-line" onclick="setType('line')">Line</button>
+            <button class="act-btn" id="btn-scatter" onclick="setType('scatter')">Scatter</button>
+            <button class="act-btn" id="btn-histogram" onclick="setType('histogram')">Histogram</button>
           </div>
         </div>
       </div>
@@ -815,7 +814,88 @@ canvas { position: absolute; top: 0; left: 0; }
         </div>
       </div>
 
-      <!-- CARD 3: GRAPH TITLES & AXES -->
+      <!-- CARD 3: CATEGORY EDITOR (BAR GRAPH ONLY) -->
+      <div class="opt-group" id="cat-section" style="display:none;">
+        <div class="opt-group-header">
+          <div class="opt-group-header-left">
+            <i class="ti ti-layout-navbar"></i>
+            <span class="opt-group-title">X Categories</span>
+          </div>
+        </div>
+        <div class="opt-group-body">
+          <span class="card-desc">The individual groups along the x-axis.</span>
+          <div id="cat-list"></div>
+          <div id="cat-input-wrap">
+            <input type="text" id="cat-input" placeholder="Category name..."
+              oninput="hideCategoryArrow()"
+              onkeydown="if(event.key==='Enter')addCategory()">
+            <button class="btn btn-secondary btn-sm" onclick="addCategory()">
+              <i class="ti ti-plus"></i> Add
+            </button>
+          </div>
+          <div id="cat-arrow-hint">
+            <i class="ti ti-arrow-up"></i>
+            <span>Add category name here first</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 4: HISTOGRAM CONFIG (HISTOGRAM ONLY - POSITIONED ABOVE LABELS & SCALES) -->
+      <div class="opt-group" id="hist-section" style="display:none;">
+        <div class="opt-group-header">
+          <div class="opt-group-header-left">
+            <i class="ti ti-chart-histogram"></i>
+            <span class="opt-group-title">Histogram Bins</span>
+          </div>
+        </div>
+        <div class="opt-group-body">
+          <span class="card-desc">Bins are equal number ranges (like 0–5, 5–10) that group your data together along the bottom axis.</span>
+          <div class="grid-3">
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Bin Start</label>
+              <input type="number" id="inp-binstart" value="0" oninput="redraw()">
+            </div>
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Width</label>
+              <input type="number" id="inp-binwidth" value="1" min="0.01" oninput="redraw()">
+            </div>
+            <div>
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600;"># Bins</label>
+              <input type="number" id="inp-bincount" value="5" min="1" max="20" oninput="redraw()">
+            </div>
+          </div>
+          <div id="hist-hint" style="font-size:8.5pt; color:#d55e00; margin-top:8px; display:none;">
+            <i class="ti ti-info-circle"></i> Set bin parameters above, then click each bin to plot frequency.
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 5: LEGEND & SERIES / GROUPS -->
+      <div class="opt-group controls-locked" id="leg-section">
+        <div class="opt-group-header">
+          <div class="opt-group-header-left">
+            <i class="ti ti-palette"></i>
+            <span class="opt-group-title" id="leg-title">Series</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-addseries" onclick="addSeries()">
+            <i class="ti ti-plus"></i> Add Series
+          </button>
+        </div>
+        <div class="opt-group-body">
+          <span class="card-desc" id="leg-desc" style="display:none;"></span>
+          <div id="leg-normal">
+            <div id="leg-list"></div>
+          </div>
+          <div id="leg-hist" style="display:none;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <label style="font-size:9.5pt; font-weight:600; color:var(--input-label);">Bar Color:</label>
+              <div id="hist-color-wrap"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 6: GRAPH TITLES & AXES -->
       <div class="opt-group controls-locked" id="card-axes">
         <div class="opt-group-header">
           <div class="opt-group-header-left">
@@ -883,84 +963,6 @@ canvas { position: absolute; top: 0; left: 0; }
             <div>
               <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Y Step</label>
               <input type="number" id="inp-ystep" value="1" oninput="redraw()">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 4: CATEGORY EDITOR (BAR GRAPH ONLY) -->
-      <div class="opt-group" id="cat-section" style="display:none;">
-        <div class="opt-group-header">
-          <div class="opt-group-header-left">
-            <i class="ti ti-layout-navbar"></i>
-            <span class="opt-group-title">X Categories</span>
-          </div>
-        </div>
-        <div class="opt-group-body">
-          <div id="cat-list"></div>
-          <div id="cat-input-wrap">
-            <input type="text" id="cat-input" placeholder="Category name..."
-              oninput="hideCategoryArrow()"
-              onkeydown="if(event.key==='Enter')addCategory()">
-            <button class="btn btn-secondary btn-sm" onclick="addCategory()">
-              <i class="ti ti-plus"></i> Add
-            </button>
-          </div>
-          <div id="cat-arrow-hint">
-            <i class="ti ti-arrow-up"></i>
-            <span>Add category name here first</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 5: HISTOGRAM CONFIG -->
-      <div class="opt-group" id="hist-section" style="display:none;">
-        <div class="opt-group-header">
-          <div class="opt-group-header-left">
-            <i class="ti ti-chart-histogram"></i>
-            <span class="opt-group-title">Histogram Bins</span>
-          </div>
-        </div>
-        <div class="opt-group-body">
-          <div class="grid-3">
-            <div>
-              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Bin Start</label>
-              <input type="number" id="inp-binstart" value="0" oninput="redraw()">
-            </div>
-            <div>
-              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Width</label>
-              <input type="number" id="inp-binwidth" value="1" min="0.01" oninput="redraw()">
-            </div>
-            <div>
-              <label style="font-size:8pt; color:var(--input-label); font-weight:600;"># Bins</label>
-              <input type="number" id="inp-bincount" value="5" min="1" max="20" oninput="redraw()">
-            </div>
-          </div>
-          <div id="hist-hint" style="font-size:8.5pt; color:#d55e00; margin-top:8px; display:none;">
-            <i class="ti ti-info-circle"></i> Set bin parameters above, then click each bin to plot frequency.
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 6: LEGEND & SERIES -->
-      <div class="opt-group controls-locked" id="leg-section">
-        <div class="opt-group-header">
-          <div class="opt-group-header-left">
-            <i class="ti ti-palette"></i>
-            <span class="opt-group-title" id="leg-title">Legend / Series</span>
-          </div>
-          <button class="btn btn-secondary btn-sm" id="btn-addseries" onclick="addSeries()">
-            <i class="ti ti-plus"></i> Add Series
-          </button>
-        </div>
-        <div class="opt-group-body">
-          <div id="leg-normal">
-            <div id="leg-list"></div>
-          </div>
-          <div id="leg-hist" style="display:none;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <label style="font-size:9.5pt; font-weight:600; color:var(--input-label);">Bar Color:</label>
-              <div id="hist-color-wrap"></div>
             </div>
           </div>
         </div>
@@ -2037,6 +2039,69 @@ function renderLegList(focusIndex = -1){
 }
 
 // ════════════════════════════════════════════════
+//  RESET APPLICATION (START FRESH)
+// ════════════════════════════════════════════════
+function resetApp(){
+  if(graphType !== null) {
+    if(!confirm('Start a new graph? All unsaved work will be lost.')) return;
+  }
+
+  graphType = null;
+  activeSer = 0;
+  showBestFit = false;
+  showMinorGrid = false;
+  errorMode = false;
+  deleteMode = false;
+  categories = [];
+  series = [
+    { label:'Series 1', color: COLORS[0], points:[], errors:[] }
+  ];
+
+  document.getElementById('card-tools').classList.add('controls-locked');
+  document.getElementById('card-axes').classList.add('controls-locked');
+  document.getElementById('leg-section').classList.add('controls-locked');
+
+  ['bar','line','scatter','histogram'].forEach(g => {
+    const btn = document.getElementById('btn-'+g);
+    if(btn) btn.classList.remove('active-mode');
+  });
+
+  document.getElementById('btn-bf').classList.remove('active-mode');
+  document.getElementById('btn-mg').classList.remove('active-mode');
+  document.getElementById('btn-eb').classList.remove('active-mode');
+  document.getElementById('btn-delete').classList.remove('active-mode');
+
+  document.getElementById('cat-section').style.display = 'none';
+  document.getElementById('hist-section').style.display = 'none';
+  document.getElementById('xscale-row').style.display = 'none';
+  document.getElementById('bar-ser-picker').style.display = 'none';
+  document.getElementById('html-legend').style.display = 'none';
+  document.getElementById('leg-desc').style.display = 'none';
+  document.getElementById('hist-hint').style.display = 'none';
+  hideCategoryArrow();
+
+  document.getElementById('inp-title').value = '';
+  document.getElementById('inp-xlabel').value = '';
+  document.getElementById('inp-ylabel').value = '';
+  document.getElementById('cat-input').value = '';
+
+  document.getElementById('inp-xmin').value = '0';
+  document.getElementById('inp-xmax').value = '10';
+  document.getElementById('inp-xstep').value = '';
+  document.getElementById('inp-ymin').value = '-10';
+  document.getElementById('inp-ymax').value = '10';
+  document.getElementById('inp-ystep').value = '1';
+  document.getElementById('inp-binstart').value = '0';
+  document.getElementById('inp-binwidth').value = '1';
+  document.getElementById('inp-bincount').value = '5';
+
+  renderCatList();
+  renderSerSelect();
+  renderLegList();
+  redraw();
+}
+
+// ════════════════════════════════════════════════
 //  TOOLBAR TOGGLES & TYPES
 // ════════════════════════════════════════════════
 function setScaleDefaults(type){
@@ -2074,8 +2139,20 @@ function setType(t){
   const isHist = (t === 'histogram');
 
   const legTitle = document.getElementById('leg-title');
-  if(legTitle){
-    legTitle.textContent = isCat ? 'Groups within Categories' : 'Legend / Series';
+  const legDesc  = document.getElementById('leg-desc');
+
+  if(isCat){
+    legTitle.textContent = 'Groups within Categories';
+    legDesc.innerHTML = 'Different groups within each of the x-categories.<br>&bull; Leave alone if creating a single bar graph.<br>&bull; Add up to eight to create a clustered bar graph.';
+    legDesc.style.display = 'block';
+  } else if(isHist){
+    legTitle.textContent = 'Series';
+    legDesc.innerHTML = '';
+    legDesc.style.display = 'none';
+  } else {
+    legTitle.textContent = 'Series';
+    legDesc.textContent = 'A set of connected points or dots from one experiment or test. Add another series to compare multiple different data sets on the same graph.';
+    legDesc.style.display = 'block';
   }
 
   document.getElementById('cat-section').style.display  = isCat  ? 'block' : 'none';
@@ -2198,7 +2275,7 @@ function getTimestamp(){
 
 function saveProject(){
   const projectData = {
-    version: '1.1.0',
+    version: '1.2.0',
     graphType,
     title: document.getElementById('inp-title').value,
     xlabel: document.getElementById('inp-xlabel').value,
