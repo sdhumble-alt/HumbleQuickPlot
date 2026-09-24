@@ -256,13 +256,17 @@ select:focus {
   box-shadow: 0 0 0 3px var(--input-focus-ring);
 }
 
-input[type=number] {
+.grid-3 input[type=number],
+#inp-binstart, #inp-binwidth, #inp-bincount {
   text-align: center;
   -moz-appearance: textfield;
 }
 
-input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-inner-spin-button {
+.grid-3 input[type=number]::-webkit-outer-spin-button,
+.grid-3 input[type=number]::-webkit-inner-spin-button,
+#inp-binstart::-webkit-outer-spin-button, #inp-binstart::-webkit-inner-spin-button,
+#inp-binwidth::-webkit-outer-spin-button, #inp-binwidth::-webkit-inner-spin-button,
+#inp-bincount::-webkit-outer-spin-button, #inp-bincount::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
@@ -283,7 +287,7 @@ input[type=number]::-webkit-inner-spin-button {
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 
-/* ── BUTTONS & CENTERING ── */
+/* ── BUTTONS & TOOLBAR LAYOUT ── */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -291,8 +295,8 @@ input[type=number]::-webkit-inner-spin-button {
   text-align: center;
   gap: 5px;
   border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 9.5pt;
+  padding: 6px 10px;
+  font-size: 9pt;
   font-family: Arial, sans-serif;
   font-weight: 600;
   cursor: pointer;
@@ -337,7 +341,7 @@ input[type=number]::-webkit-inner-spin-button {
 }
 
 .btn-sm {
-  padding: 5px 9px;
+  padding: 5px 8px;
   font-size: 8.5pt;
 }
 
@@ -349,6 +353,58 @@ input[type=number]::-webkit-inner-spin-button {
 .btn-header:hover {
   background: rgba(255, 255, 255, 0.22);
   border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── TOOLS & MODIFIERS GRID WITH TICK FONT SPINNER ── */
+.tools-layout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.tools-btns-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  flex: 1;
+}
+
+.tools-btns-grid .btn {
+  padding: 6px 3px;
+  font-size: 8pt;
+  width: 100%;
+}
+
+.tick-font-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 62px;
+  border-left: 1px solid #e2e8f0;
+  padding-left: 8px;
+}
+
+.tick-font-box label {
+  font-size: 7.5pt;
+  color: var(--input-label);
+  font-weight: 700;
+  white-space: nowrap;
+  margin-bottom: 4px;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.tick-font-box input[type=number] {
+  width: 54px;
+  height: 31px;
+  padding: 2px 2px 2px 6px;
+  font-size: 9.5pt;
+  font-weight: 600;
+  border-radius: 5px;
+  text-align: left;
 }
 
 /* ── ACTION GRID (GRAPH TYPES) ── */
@@ -504,8 +560,37 @@ input[type=number]::-webkit-inner-spin-button {
   gap: 6px;
 }
 
+/* Crisp Inline Vector Trash Can Button */
 .leg-row .del-btn {
-  padding: 5px 8px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: var(--btn-danger-bg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.leg-row .del-btn:hover {
+  background: var(--btn-danger-hover);
+}
+
+.leg-row .del-btn svg {
+  width: 15px;
+  height: 15px;
+  stroke: #ffffff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  display: block;
 }
 
 /* ── COLOR PICKER DROPDOWN ── */
@@ -517,7 +602,7 @@ input[type=number]::-webkit-inner-spin-button {
 
 .color-trigger {
   width: 30px;
-  height: 24px;
+  height: 28px;
   border: 1.5px solid var(--card-border);
   border-radius: 6px;
   cursor: pointer;
@@ -750,7 +835,7 @@ canvas { position: absolute; top: 0; left: 0; }
     <button class="btn btn-sm btn-header" onclick="resetApp()" title="Reset graph and start fresh">New</button>
     <button class="btn btn-sm btn-header" onclick="saveProject()" title="Save project to .json file">Save</button>
     <button class="btn btn-sm btn-header" onclick="document.getElementById('file-loader').click()" title="Open existing .json project">Open</button>
-    <div class="toolbar-ver">V 1.2.0 &mdash; 2026-09-16</div>
+    <div class="toolbar-ver">V 1.3.0 &mdash; 2026-09-24</div>
   </div>
 </header>
 
@@ -788,28 +873,33 @@ canvas { position: absolute; top: 0; left: 0; }
           </div>
         </div>
         <div class="opt-group-body">
-          <div class="btn-row" style="margin-top:0; margin-bottom:8px;">
-            <button class="btn btn-secondary btn-sm" id="btn-bf" onclick="toggleBestFit()" title="Toggle best-fit line & regression (scatter)">
-              <i class="ti ti-math-function"></i> Best Fit
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btn-eb" onclick="toggleErrorBars()" title="Toggle error bar entry mode">
-              <i class="ti ti-plus-minus"></i> ± Error
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btn-mg" onclick="toggleMinorGrid()" title="Toggle minor gridlines">
-              <i class="ti ti-grid-dots"></i> Minor Grid
-            </button>
-          </div>
+          <div class="tools-layout">
+            <div class="tools-btns-grid">
+              <button class="btn btn-secondary btn-sm" id="btn-bf" onclick="toggleBestFit()" title="Toggle best-fit line & regression (scatter)">
+                <i class="ti ti-math-function"></i> Best Fit
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-eb" onclick="toggleErrorBars()" title="Toggle error bar entry mode">
+                <i class="ti ti-plus-minus"></i> ± Error
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-mg" onclick="toggleMinorGrid()" title="Toggle minor gridlines">
+                <i class="ti ti-grid-dots"></i> Minor
+              </button>
 
-          <div class="btn-row" style="margin-top:0;">
-            <button class="btn btn-secondary btn-sm" onclick="undoLast()">
-              <i class="ti ti-arrow-back-up"></i> Undo
-            </button>
-            <button class="btn btn-secondary btn-sm" id="btn-delete" onclick="toggleDeleteMode()" title="Toggle delete point mode">
-              <i class="ti ti-trash"></i> Delete
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="clearAll()">
-              <i class="ti ti-x"></i> Clear
-            </button>
+              <button class="btn btn-secondary btn-sm" onclick="undoLast()" title="Undo last point">
+                <i class="ti ti-arrow-back-up"></i> Undo
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-delete" onclick="toggleDeleteMode()" title="Toggle delete point mode">
+                <i class="ti ti-trash"></i> Delete
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="clearAll()" title="Clear all points">
+                <i class="ti ti-x"></i> Clear
+              </button>
+            </div>
+
+            <div class="tick-font-box">
+              <label for="inp-tick-font">Tick Font</label>
+              <input type="number" id="inp-tick-font" value="16" min="6" max="24" step="1" oninput="onTickFontInput()" title="Set font size for axis tick numbers/categories">
+            </div>
           </div>
         </div>
       </div>
@@ -840,7 +930,7 @@ canvas { position: absolute; top: 0; left: 0; }
         </div>
       </div>
 
-      <!-- CARD 4: HISTOGRAM CONFIG (HISTOGRAM ONLY - POSITIONED ABOVE LABELS & SCALES) -->
+      <!-- CARD 4: HISTOGRAM CONFIG (HISTOGRAM ONLY) -->
       <div class="opt-group" id="hist-section" style="display:none;">
         <div class="opt-group-header">
           <div class="opt-group-header-left">
@@ -851,21 +941,21 @@ canvas { position: absolute; top: 0; left: 0; }
         <div class="opt-group-body">
           <span class="card-desc">Bins are equal number ranges (like 0–5, 5–10) that group your data together along the bottom axis.</span>
           <div class="grid-3">
-            <div>
-              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Bin Start</label>
-              <input type="number" id="inp-binstart" value="0" oninput="redraw()">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600; text-align:center; width:100%; margin-bottom:4px;">Bin Starts At</label>
+              <input type="number" id="inp-binstart" oninput="onHistParamsChange()">
             </div>
-            <div>
-              <label style="font-size:8pt; color:var(--input-label); font-weight:600;">Width</label>
-              <input type="number" id="inp-binwidth" value="1" min="0.01" oninput="redraw()">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600; text-align:center; width:100%; margin-bottom:4px;">Width of Bin</label>
+              <input type="number" id="inp-binwidth" min="0.01" oninput="onHistParamsChange()">
             </div>
-            <div>
-              <label style="font-size:8pt; color:var(--input-label); font-weight:600;"># Bins</label>
-              <input type="number" id="inp-bincount" value="5" min="1" max="20" oninput="redraw()">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <label style="font-size:8pt; color:var(--input-label); font-weight:600; text-align:center; width:100%; margin-bottom:4px;"># of Bins</label>
+              <input type="number" id="inp-bincount" min="1" max="20" oninput="onHistParamsChange()">
             </div>
           </div>
-          <div id="hist-hint" style="font-size:8.5pt; color:#d55e00; margin-top:8px; display:none;">
-            <i class="ti ti-info-circle"></i> Set bin parameters above, then click each bin to plot frequency.
+          <div id="hist-hint" style="font-size:8.5pt; color:#d55e00; margin-top:8px; display:none; text-align:center;">
+            <i class="ti ti-info-circle"></i> Fill all 3 bin settings above to unlock graph and plot frequencies.
           </div>
         </div>
       </div>
@@ -1041,6 +1131,69 @@ let series = [
 ];
 
 // ════════════════════════════════════════════════
+//  DYNAMIC LOCK / UNLOCK SYSTEM
+// ════════════════════════════════════════════════
+function isHistConfigured(){
+  if(graphType !== 'histogram') return false;
+  const sStr = document.getElementById('inp-binstart').value.trim();
+  const wStr = document.getElementById('inp-binwidth').value.trim();
+  const cStr = document.getElementById('inp-bincount').value.trim();
+  if(sStr === '' || wStr === '' || cStr === '') return false;
+  const s = parseFloat(sStr);
+  const w = parseFloat(wStr);
+  const c = parseInt(cStr, 10);
+  return !isNaN(s) && !isNaN(w) && w > 0 && !isNaN(c) && c >= 1;
+}
+
+function updateContextualLocks(){
+  const legCard  = document.getElementById('leg-section');
+  const axesCard = document.getElementById('card-axes');
+  const bsp      = document.getElementById('bar-ser-picker');
+
+  if(graphType === 'bar'){
+    const hasCats = categories.length > 0;
+    legCard.classList.toggle('controls-locked', !hasCats);
+    axesCard.classList.toggle('controls-locked', !hasCats);
+    bsp.style.display = hasCats ? 'flex' : 'none';
+  } else if(graphType === 'histogram'){
+    const ready = isHistConfigured();
+    legCard.classList.toggle('controls-locked', !ready);
+    axesCard.classList.toggle('controls-locked', !ready);
+    bsp.style.display = 'none';
+    const hint = document.getElementById('hist-hint');
+    if(hint){
+      hint.style.display = ready ? 'none' : 'block';
+    }
+  } else if(graphType === 'line' || graphType === 'scatter'){
+    legCard.classList.remove('controls-locked');
+    axesCard.classList.remove('controls-locked');
+    bsp.style.display = 'flex';
+  } else {
+    legCard.classList.add('controls-locked');
+    axesCard.classList.add('controls-locked');
+    bsp.style.display = 'none';
+  }
+}
+
+function onHistParamsChange(){
+  updateContextualLocks();
+  redraw();
+}
+
+// ════════════════════════════════════════════════
+//  TICK FONT SIZE CONTROL
+// ════════════════════════════════════════════════
+function getTickFontSize(){
+  const inp = document.getElementById('inp-tick-font');
+  const val = parseInt(inp.value, 10);
+  return (!isNaN(val) && val >= 6) ? val : 16;
+}
+
+function onTickFontInput(){
+  redraw();
+}
+
+// ════════════════════════════════════════════════
 //  UNICODE MAPS & SELECTION FORMATTING
 // ════════════════════════════════════════════════
 const SUPER_MAP = {
@@ -1053,7 +1206,7 @@ const SUPER_MAP = {
 const SUB_MAP = {
   '0':'₀', '1':'₁', '2':'₂', '3':'₃', '4':'₄', '5':'₅', '6':'₆', '7':'₇', '8':'₈', '9':'₉',
   '+':'₊', '-':'₋', '=':'₌', '(':'₍', ')':'₎', 'a':'ₐ', 'e':'ₑ', 'h':'ₕ', 'i':'ᵢ', 'j':'ⱼ',
-  'k':'ₖ', 'l':'ₗ', 'm':'ₘ', 'n':'ₙ', 'o':'ₒ', 'p':'ₚ', 'r':'ᵣ', 's':'ₛ', 't':'ₜ', 'u':'ᵤ',
+  'k':'ₖ', 'l':'ₗ', 'm':'ₘ', 'n':'ⁿ', 'o':'ᵒ', 'p':'ₚ', 'r':'ᵣ', 's':'ₛ', 't':'ₜ', 'u':'ᵤ',
   'v':'ᵥ', 'x':'ₓ'
 };
 
@@ -1222,9 +1375,10 @@ function darken(hex){
 // ════════════════════════════════════════════════
 function syncHistXScale(){
   if(graphType !== 'histogram') return;
-  const start = parseFloat(document.getElementById('inp-binstart').value) || 0;
-  const bw    = Math.max(0.01, parseFloat(document.getElementById('inp-binwidth').value) || 1);
-  const n     = Math.max(1, Math.min(20, parseInt(document.getElementById('inp-bincount').value) || 5));
+  if(!isHistConfigured()) return;
+  const start = histBinStart();
+  const bw    = histBinWidth();
+  const n     = histBinCount();
   document.getElementById('inp-xmin').value = start;
   document.getElementById('inp-xmax').value = start + n * bw;
 }
@@ -1233,7 +1387,7 @@ function drawGrid(){
   gctx.clearRect(0,0,W,H);
   gctx.fillStyle='#fff'; gctx.fillRect(0,0,W,H);
 
-  const fs   = Math.max(9, Math.round(W / 80));
+  const fs   = getTickFontSize();
   const fsl  = Math.max(13, Math.round(W / 50));
   const fsp  = Math.max(11, Math.round(W / 60));
 
@@ -1321,11 +1475,24 @@ function drawGrid(){
       updateCatHint(true);
     }
   } else if(graphType==='histogram'){
-    const start = parseFloat(document.getElementById('inp-binstart').value) || 0;
-    const bw    = Math.max(0.01, parseFloat(document.getElementById('inp-binwidth').value) || 1);
-    const n     = Math.max(1, Math.min(20, parseInt(document.getElementById('inp-bincount').value) || 5));
-    for(let i=0; i<=n; i++){
-      drawXTick(start + i*bw, fmt(start + i*bw));
+    if(isHistConfigured()){
+      const start = histBinStart();
+      const bw    = histBinWidth();
+      const n     = histBinCount();
+      for(let i=0; i<=n; i++){
+        drawXTick(start + i*bw, fmt(start + i*bw));
+      }
+    } else {
+      const cx = M.left + pW()/2;
+      const cy = M.top  + pH()/2;
+      gctx.save();
+      gctx.fillStyle   = '#d55e00';
+      gctx.font        = `bold ${fsp}px 'Arial Narrow', Arial, sans-serif`;
+      gctx.textAlign   = 'center';
+      gctx.fillText('Enter Histogram Bins to Begin', cx, cy - Math.round(fsp*0.8));
+      gctx.font        = `${Math.round(fsp*0.85)}px 'Arial Narrow', Arial, sans-serif`;
+      gctx.fillText('Provide Bin Start, Width, and # of Bins', cx, cy + Math.round(fsp*0.9));
+      gctx.restore();
     }
   } else {
     niceSteps(xMin(), xMax(), xStep()).forEach(v => drawXTick(v, fmt(v)));
@@ -1471,9 +1638,10 @@ function drawBars(){
 
 function histBinStart()  { return parseFloat(document.getElementById('inp-binstart').value)  || 0; }
 function histBinWidth()  { return Math.max(0.01, parseFloat(document.getElementById('inp-binwidth').value) || 1); }
-function histBinCount()  { return Math.max(1, Math.min(20, parseInt(document.getElementById('inp-bincount').value) || 5)); }
+function histBinCount()  { return Math.max(1, Math.min(20, parseInt(document.getElementById('inp-bincount').value, 10) || 5)); }
 
 function histBins(){
+  if(!isHistConfigured()) return [];
   const start = histBinStart(), bw = histBinWidth(), n = histBinCount();
   const s = series[0];
   const bins = [];
@@ -1487,6 +1655,7 @@ function histBins(){
 }
 
 function drawHistogram(){
+  if(!isHistConfigured()) return;
   const color = series[0].color;
   const baseline = Math.max(yMin(), Math.min(yMax(), 0));
   const bins = histBins();
@@ -1724,7 +1893,7 @@ dc.addEventListener('mousemove', e => {
   if(inPlot(px, py)){
     dc.style.cursor = errorMode ? 'cell' : (deleteMode ? 'not-allowed' : 'crosshair');
     if(dragging && !errorMode && graphType !== 'bar') handlePlotClick(px, py);
-    if(dragging && graphType === 'histogram') handlePlotClick(px, py);
+    if(dragging && graphType === 'histogram' && isHistConfigured()) handlePlotClick(px, py);
   } else {
     dc.style.cursor = 'default';
   }
@@ -1771,6 +1940,7 @@ function handlePlotClick(px, py){
     if(existing !== -1) series[activeSer].points[existing].y = ySnap;
     else series[activeSer].points.push({ cat: ci, y: ySnap, err: 0 });
   } else if(graphType === 'histogram'){
+    if(!isHistConfigured()) return;
     const start = histBinStart(), bw = histBinWidth(), n = histBinCount();
     const binIdx = Math.floor((px2x(px) - start) / bw);
     if(binIdx < 0 || binIdx >= n) return;
@@ -1831,6 +2001,7 @@ function addCategory(){
   hideCategoryArrow();
   renderCatList();
   updateCatHint(false);
+  updateContextualLocks();
   redraw();
 }
 
@@ -1843,6 +2014,7 @@ function removeCategory(i){
   });
   renderCatList();
   updateCatHint(categories.length === 0);
+  updateContextualLocks();
   redraw();
 }
 
@@ -1942,7 +2114,7 @@ function addSeries(focusNew = false){
   if(series.length>=8) return;
   series.push({ label:`Series ${series.length+1}`, color:COLORS[series.length%COLORS.length], points:[], errors:[] });
   activeSer=series.length-1;
-  if(graphType !== 'histogram') document.getElementById('bar-ser-picker').style.display = 'flex';
+  updateContextualLocks();
   renderSerSelect();
   renderLegList(focusNew ? series.length - 1 : -1);
   redraw();
@@ -2019,8 +2191,14 @@ function renderLegList(focusIndex = -1){
     };
 
     const delBtn = document.createElement('button');
-    delBtn.className = 'btn btn-danger btn-sm del-btn';
-    delBtn.innerHTML = '<i class="ti ti-x"></i>';
+    delBtn.type = 'button';
+    delBtn.className = 'del-btn';
+    delBtn.title = 'Remove series';
+    delBtn.innerHTML = `
+      <svg viewBox="0 0 24 24">
+        <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/>
+      </svg>
+    `;
     delBtn.onclick = () => removeSeries(i);
 
     row.appendChild(colorSelect);
@@ -2053,6 +2231,9 @@ function resetApp(){
   errorMode = false;
   deleteMode = false;
   categories = [];
+
+  document.getElementById('inp-tick-font').value = '16';
+
   series = [
     { label:'Series 1', color: COLORS[0], points:[], errors:[] }
   ];
@@ -2091,13 +2272,14 @@ function resetApp(){
   document.getElementById('inp-ymin').value = '-10';
   document.getElementById('inp-ymax').value = '10';
   document.getElementById('inp-ystep').value = '1';
-  document.getElementById('inp-binstart').value = '0';
-  document.getElementById('inp-binwidth').value = '1';
-  document.getElementById('inp-bincount').value = '5';
+  document.getElementById('inp-binstart').value = '';
+  document.getElementById('inp-binwidth').value = '';
+  document.getElementById('inp-bincount').value = '';
 
   renderCatList();
   renderSerSelect();
   renderLegList();
+  updateContextualLocks();
   redraw();
 }
 
@@ -2113,6 +2295,9 @@ function setScaleDefaults(type){
     document.getElementById('inp-ymin').value  = '0';
     document.getElementById('inp-ymax').value  = '10';
     document.getElementById('inp-ystep').value = '1';
+    document.getElementById('inp-binstart').value = '';
+    document.getElementById('inp-binwidth').value = '';
+    document.getElementById('inp-bincount').value = '';
   } else {
     document.getElementById('inp-xmin').value  = '-10';
     document.getElementById('inp-xmax').value  = '10';
@@ -2127,8 +2312,6 @@ function setType(t){
   graphType = t;
 
   document.getElementById('card-tools').classList.remove('controls-locked');
-  document.getElementById('card-axes').classList.remove('controls-locked');
-  document.getElementById('leg-section').classList.remove('controls-locked');
 
   ['bar','line','scatter','histogram'].forEach(g => {
     const btn = document.getElementById('btn-'+g);
@@ -2168,7 +2351,6 @@ function setType(t){
   const xrow = document.getElementById('xscale-row');
   xrow.style.display = showXScale ? 'grid' : 'none';
 
-  document.getElementById('bar-ser-picker').style.display = isHist ? 'none' : 'flex';
   document.getElementById('btn-bf').style.opacity = t === 'scatter' ? '1' : '0.4';
   document.getElementById('btn-eb').style.opacity = isHist ? '0.4' : '1';
   if(isHist && errorMode){ errorMode = false; document.getElementById('btn-eb').classList.remove('active-mode'); }
@@ -2183,8 +2365,8 @@ function setType(t){
 
   hideCategoryArrow();
   updateCatHint(isCat && categories.length === 0);
-  document.getElementById('hist-hint').style.display = isHist ? 'block' : 'none';
 
+  updateContextualLocks();
   renderSerSelect();
   renderLegList();
   redraw();
@@ -2228,6 +2410,7 @@ function deleteNearest(px, py){
       redraw();
     }
   } else if(graphType === 'histogram'){
+    if(!isHistConfigured()) return;
     const start = histBinStart(), bw = histBinWidth(), n = histBinCount();
     const binIdx = Math.floor((px2x(px) - start) / bw);
     if(binIdx < 0 || binIdx >= n) return;
@@ -2275,7 +2458,7 @@ function getTimestamp(){
 
 function saveProject(){
   const projectData = {
-    version: '1.2.0',
+    version: '1.3.0',
     graphType,
     title: document.getElementById('inp-title').value,
     xlabel: document.getElementById('inp-xlabel').value,
@@ -2291,6 +2474,7 @@ function saveProject(){
     bincount: document.getElementById('inp-bincount').value,
     showBestFit,
     showMinorGrid,
+    tickFontSize: document.getElementById('inp-tick-font').value,
     categories,
     series
   };
@@ -2325,9 +2509,10 @@ function handleFileLoad(event){
       document.getElementById('inp-ymax').value = data.ymax ?? '10';
       document.getElementById('inp-ystep').value = data.ystep ?? '1';
 
-      if(data.binstart) document.getElementById('inp-binstart').value = data.binstart;
-      if(data.binwidth) document.getElementById('inp-binwidth').value = data.binwidth;
-      if(data.bincount) document.getElementById('inp-bincount').value = data.bincount;
+      document.getElementById('inp-binstart').value = data.binstart ?? '';
+      document.getElementById('inp-binwidth').value = data.binwidth ?? '';
+      document.getElementById('inp-bincount').value = data.bincount ?? '';
+      document.getElementById('inp-tick-font').value = data.tickFontSize ?? '16';
 
       setType(data.graphType);
 
@@ -2343,6 +2528,7 @@ function handleFileLoad(event){
       renderCatList();
       renderSerSelect();
       renderLegList();
+      updateContextualLocks();
       redraw();
     } catch(err){
       alert('Failed to load project: ' + err.message);
