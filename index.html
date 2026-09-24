@@ -1904,7 +1904,6 @@ function getShapeSvg(shape, color){
   } else if(shape === 'star'){
     return `<svg viewBox="0 0 16 16"><polygon points="8,1.5 9.8,5.8 14.5,6.2 11,9.2 12,13.8 8,11.4 4,13.8 5,9.2 1.5,6.2 6.2,5.8" fill="${color}" stroke="${stroke}" stroke-width="1"/></svg>`;
   } else {
-    // circle default
     return `<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="${color}" stroke="${stroke}" stroke-width="1.2"/></svg>`;
   }
 }
@@ -2280,7 +2279,6 @@ function setSeriesMode(mode){
     document.getElementById('leg-normal').style.display = 'none';
     renderSingleColorPicker();
   } else {
-    // Default to at least two series when switching to clustered / multiple
     if(series.length < 2){
       series.push({
         label: 'Series 2',
@@ -2355,7 +2353,6 @@ function removeSeries(i){
   series.splice(i,1);
   if(activeSer>=series.length) activeSer=series.length-1;
 
-  // Auto-switch back to single if only one series remains
   if(series.length === 1){
     setSeriesMode('single');
     return;
@@ -2602,7 +2599,7 @@ function setType(t){
     toggleWrap.style.display = 'grid';
     btnSingle.textContent = 'One Set of Data';
     btnMulti.textContent  = 'Multiple Sets of Data';
-    lblColor.textContent  = (t === 'line') ? 'Line Color:' : 'Point Color:';
+    lblColor.textContent  = 'Color:';
     document.getElementById('leg-hist').style.display = 'none';
     setSeriesMode('single');
   }
