@@ -909,7 +909,7 @@ canvas { position: absolute; top: 0; left: 0; }
     <button class="btn btn-sm btn-header" onclick="resetApp()" title="Reset graph and start fresh">New</button>
     <button class="btn btn-sm btn-header" onclick="saveProject()" title="Save project to .json file">Save</button>
     <button class="btn btn-sm btn-header" onclick="document.getElementById('file-loader').click()" title="Open existing .json project">Open</button>
-    <div class="toolbar-ver">V 1.4.0 &mdash; 2026-09-24</div>
+    <div class="toolbar-ver">V 1.4.3 &mdash; 2026-10-01</div>
   </div>
 </header>
 
@@ -972,7 +972,7 @@ canvas { position: absolute; top: 0; left: 0; }
 
             <div class="tick-font-box">
               <label for="inp-tick-font">Tick Font</label>
-              <input type="number" id="inp-tick-font" value="14" min="6" max="24" step="1" oninput="onTickFontInput()" title="Set font size for axis tick numbers/categories">
+              <input type="number" id="inp-tick-font" value="16" min="6" max="24" step="1" oninput="onTickFontInput()" title="Set font size for axis tick numbers/categories">
             </div>
           </div>
         </div>
@@ -1196,7 +1196,7 @@ canvas { position: absolute; top: 0; left: 0; }
 //  CONSTANTS & STATE (Okabe-Ito Palette)
 // ════════════════════════════════════════════════
 let W = 800, H = 600;
-const M = { top: 40, right: 30, bottom: 64, left: 64 };
+const M = { top: 72, right: 30, bottom: 84, left: 88 };
 
 const PRESET_COLORS = [
   { name: 'Navy / Blue',     value: '#0072B2' },
@@ -1281,7 +1281,7 @@ function onHistParamsChange(){
 function getTickFontSize(){
   const inp = document.getElementById('inp-tick-font');
   const val = parseInt(inp.value, 10);
-  return (!isNaN(val) && val >= 6) ? val : 14;
+  return (!isNaN(val) && val >= 6) ? val : 16;
 }
 
 function onTickFontInput(){
@@ -1373,8 +1373,15 @@ function resizeCanvases(){
   const tray    = document.querySelector('.export-tray');
 
   const availW = (stage.clientWidth || 600) - 36;
-  const isHist = graphType === 'histogram';
-  const stripH = (isHist || seriesMode === 'single') ? 0 : 40;
+  
+  let stripH = 0;
+  if (graphType !== 'histogram' && seriesMode === 'multi' && series.length > 1) {
+    stripH += 46; // Provide dynamic clearance for the html-legend 
+    if (graphType === 'bar' && categories.length > 0) {
+      stripH += 46; // Provide dynamic clearance for the bar-ser-picker 
+    }
+  }
+
   const trayH  = tray ? tray.offsetHeight + 18 : 60;
   const availH = (stage.clientHeight || 600) - stripH - trayH - 36;
 
@@ -1635,24 +1642,27 @@ function drawGrid(){
   const xl    = document.getElementById('inp-xlabel').value || '';
   const yl    = document.getElementById('inp-ylabel').value || '';
 
+  const titleFontSize = Math.round(fsl * 1.86);
+  const axisFontSize = Math.round(fsl * 1.54);
+
   gctx.fillStyle='#111';
   if(title){
-    gctx.font = `bold ${fsl + 2}px 'Arial Narrow', Arial, sans-serif`;
+    gctx.font = `bold ${titleFontSize}px 'Arial Narrow', Arial, sans-serif`;
     gctx.textAlign = 'center';
-    gctx.fillText(title, M.left + pW()/2, M.top - 14);
+    gctx.fillText(title, M.left + pW()/2, M.top - 24);
   }
 
   if(xl){
-    gctx.font = `bold ${fsl}px 'Arial Narrow', Arial, sans-serif`;
+    gctx.font = `bold ${axisFontSize}px 'Arial Narrow', Arial, sans-serif`;
     gctx.textAlign = 'center';
-    gctx.fillText(xl, M.left + pW()/2, H - 9);
+    gctx.fillText(xl, M.left + pW()/2, H - 14);
   }
 
   if(yl){
     gctx.save();
-    gctx.translate(Math.round(fsl * 1.05), M.top + pH()/2);
+    gctx.translate(Math.round(axisFontSize * 1.05), M.top + pH()/2);
     gctx.rotate(-Math.PI/2);
-    gctx.font = `bold ${fsl}px 'Arial Narrow', Arial, sans-serif`;
+    gctx.font = `bold ${axisFontSize}px 'Arial Narrow', Arial, sans-serif`;
     gctx.textAlign = 'center';
     gctx.fillText(yl, 0, 0);
     gctx.restore();
@@ -2348,7 +2358,6 @@ function addSeries(focusNew = false){
     points: [],
     errors: []
   });
-  activeSer=series.length-1;
   updateContextualLocks();
   renderSerSelect();
   renderLegList(focusNew ? series.length - 1 : -1);
@@ -2488,7 +2497,7 @@ function resetApp(){
   deleteMode = false;
   categories = [];
 
-  document.getElementById('inp-tick-font').value = '14';
+  document.getElementById('inp-tick-font').value = '16';
 
   series = [
     { label:'Series 1', color: COLORS[0], shape: 'circle', points:[], errors:[] }
@@ -2600,6 +2609,7 @@ function setType(t){
     lblColor.textContent  = 'Bar Color:';
     document.getElementById('leg-hist').style.display = 'none';
     setSeriesMode('single');
+    setTimeout(() => document.getElementById('cat-input').focus(), 10);
   } else if(isHist){
     legTitle.textContent = 'Bar Color';
     toggleWrap.style.display = 'none';
@@ -2728,7 +2738,7 @@ function getTimestamp(){
 
 function saveProject(){
   const projectData = {
-    version: '1.4.0',
+    version: '1.4.3',
     graphType,
     seriesMode,
     title: document.getElementById('inp-title').value,
@@ -2783,7 +2793,7 @@ function handleFileLoad(event){
       document.getElementById('inp-binstart').value = data.binstart ?? '';
       document.getElementById('inp-binwidth').value = data.binwidth ?? '';
       document.getElementById('inp-bincount').value = data.bincount ?? '';
-      document.getElementById('inp-tick-font').value = data.tickFontSize ?? '14';
+      document.getElementById('inp-tick-font').value = data.tickFontSize ?? '16';
 
       setType(data.graphType);
 
